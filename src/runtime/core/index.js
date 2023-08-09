@@ -6,6 +6,12 @@ export function _carRender(tree) {
     return tree.renderFn();
 }
 
+const defaultEventOptions = {
+    bubbles: true,  // 事件会冒泡
+    composed: true, // 事件可以穿越shadow DOM边界
+    detail: { data: undefined }
+}
+
 export class CustomElement extends HTMLElement {
     constructor() {
         super();
@@ -39,6 +45,12 @@ export class CustomElement extends HTMLElement {
 
         // 弹出refs收集器 todo：待优化
         popColletion();
+    }
+    $emit(name, value, options = {}) {
+        const _options = Object.assign(defaultEventOptions, options);
+        _options.detail.data = value;
+        const event = new CustomEvent(name, _options);
+        this.dispatchEvent(event);
     }
 }
 

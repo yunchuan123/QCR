@@ -1,6 +1,7 @@
 import { setPrefix } from "../variable-name/index.js";
 import { CustomAttributeArr, CustomAttribute } from "./custom/custom-attribute.js";
 import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
+import { processClickAttribute } from "./custom/click.js";
 
 /**
  *  将attributes转换为json
@@ -15,7 +16,7 @@ export default function (attributes = []) {
         if (CustomAttributeArr.includes(item.name)) {
             switch (item.name) {
                 case CustomAttribute.CLICK:
-                    objContent += `onClick: ${setPrefix(item.value)},`;
+                    objContent += `${processClickAttribute(item.value)},`;
                     break;
             }
             return;

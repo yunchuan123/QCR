@@ -1,3 +1,6 @@
+import babel from "@babel/core";
+import { transformIdentifier } from "./babel-plugins/transformIdentifier.js";
+
 const cacheVariableName = new Set();
 
 // const defaultPrefix = "this";
@@ -29,3 +32,15 @@ export function variableInCache(prop) {
     const propParts = prop.split(".");
     return cacheVariableNameHas(propParts[0]);
 }
+
+export function replaceVariablesUsingStateMachine(expression) {
+    expression = expression.trim();
+    const transformedCode = babel.transform(expression, {
+        plugins: [transformIdentifier],
+        generatorOpts: {
+            retainLines: true
+        }
+    });
+    return transformedCode.code.slice(0, -1)
+}
+
