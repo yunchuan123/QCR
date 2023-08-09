@@ -1,16 +1,17 @@
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
+import "../dom/index.js";
+import babel from "@babel/core"
 
 export function parseScriptVariables(code) {
-    const ast = parse(code);
+    const ast = parse(code, { sourceType: "module" });
     const variables = [];
-
     traverse.default(ast, {
         enter(path) {
             if (path.isVariableDeclaration()) {
                 const declarations = path.node.declarations;
                 declarations.forEach((declaration) => {
-                    if (declaration.id.type === 'Identifier') {
+                    if (declaration.id.type === 'Identifier' && path.parent.type === "Program") {
                         variables.push(declaration.id.name);
                     }
                 });
@@ -19,6 +20,19 @@ export function parseScriptVariables(code) {
     });
 
     return variables;
+}
+
+export function extractImportStatement(code) {
+    const ast = parse(code, { sourceType: "module"});
+    const imports = [];
+    traverse.default(ast, {
+        ImportDeclaration(path) {
+            const importedVariables = path.node.specifiers.map(specifier => {return { name: specifier.local.name, type: specifier.type }});
+            const source = path.node.source.value;
+            imports.push({ importedVariables, source });
+        }
+    });
+    return imports;
 }
 
 
@@ -35,4 +49,23 @@ export function parseScript(code) {
     }
     code += `\n return {${variables.toString()}};`
     return code;
+}
+
+export function removeImport(originalCode) {
+    const { code: transformedCode } = babel.transformSync(originalCode, {
+        ast: true,
+        plugins: [
+            // 移除 import 语句的插件
+            function removeImportsPlugin({ types: t }) {
+                return {
+                    visitor: {
+                        ImportDeclaration(path) {
+                            path.remove();
+                        },
+                    },
+                };
+            },
+        ],
+    });
+    return transformedCode;
 }

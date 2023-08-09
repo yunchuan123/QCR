@@ -1,7 +1,7 @@
 import {createFilter} from "rollup-pluginutils";
 import { readFileSync } from "fs";
 import { parse } from "./sfc/index.js";
-import { getNameByPath } from "./utils/filename-utils.js"
+import { getNameByPath } from "./utils/filename-utils.js";
 
 
 /**

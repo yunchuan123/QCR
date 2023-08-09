@@ -1,29 +1,14 @@
 import ArrayUtils from "../../utils/array-utils.js";
+import { getProcessing, PROCESSING_STATE } from "../processing/index.js";
+import { setImportPackageSet } from "../../sfc/utils/import-packages-utils.js";
+import PackageName from "../../constant/package-name.js";
+import { setPrefix, variableInCache } from "../variable-name/index.js";
 
 const TEMPLATE_VALUE = /{{\s*(.*?)\s*}}/g;
 const TEMPLATE_CONTENT = /{{\s*(.*?)\s*}}/;
 
-const defaultPrefix = "this";
-
-const cacheVariableName = new Set();
-
 export function isReactiveTemplate(content) {
     return TEMPLATE_VALUE.test(content);
-}
-
-export function setCacheVariableName(varName) {
-    cacheVariableName.add(varName)
-}
-
-export function setPrefix(prop, _prefix) {
-    const prefix = _prefix || defaultPrefix;
-    if (!prop) return "";
-    const propParts = prop.split(".");
-    if (!cacheVariableName.has(propParts[0])) {
-        return `${prefix}.${prop}`;
-    } else {
-        return prop;
-    }
 }
 
 /**
@@ -51,5 +36,10 @@ export function processTemplate(content) {
  * @returns {string}
  */
 export function generateEffectStatement(prop) {
-    return `(el) => { el.textContent = ${prop}}`
+    setImportPackageSet(PackageName.TO_DISPLAY_STRING);
+    // 如果当前是在处理for循环 应当采用不同的编译方式
+    if (getProcessing() === PROCESSING_STATE.FOR && variableInCache(prop)) {
+        return `${PackageName.TO_DISPLAY_STRING}(${prop})`;
+    }
+    return `(el) => { el.textContent = ${PackageName.TO_DISPLAY_STRING}(${setPrefix(prop)})}`
 }

@@ -1,4 +1,6 @@
-import { setPrefix } from "./reactive-dom/index.js";
+import { setPrefix } from "../variable-name/index.js";
+import { CustomAttributeArr, CustomAttribute } from "./custom/custom-attribute.js";
+
 
 /**
  *  将attributes转换为json
@@ -7,6 +9,15 @@ import { setPrefix } from "./reactive-dom/index.js";
 export default function (attributes = []) {
     let objContent = "";
     attributes.forEach((item) => {
+        if (CustomAttributeArr.includes(item.name)) {
+            switch (item.name) {
+                case CustomAttribute.CLICK:
+                    objContent += `onClick: ${setPrefix(item.value)},`;
+                    break;
+            }
+
+            return;
+        }
         if (isReactiveAttribute(item.name)) {
             objContent += generateEffectStatement(item)
         } else {
@@ -29,3 +40,7 @@ function isReactiveAttribute(attr) {
 function generateEffectStatement(attr) {
     return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}},`
 }
+
+
+export { CustomAttribute } from "./custom/custom-attribute.js";
+export { findFor } from "./custom/for.js";
