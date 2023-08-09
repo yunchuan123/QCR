@@ -6,6 +6,10 @@ export function hasImport(key) {
     importPackageSet.has(key);
 }
 
+/**
+ * 设置默认引入的包
+ * @param packageName
+ */
 export function setImportPackageSet(packageName) {
     importPackageSet.add(packageName);
 }

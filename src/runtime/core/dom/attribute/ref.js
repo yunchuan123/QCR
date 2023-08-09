@@ -1,16 +1,23 @@
-import { deepCloneMap } from "../../../utils/clone-map.js";
-
-const elementMap = new Map();
+const collectionArr = [];
+let currentMap = undefined;
 
 export function setRefMap(key, value) {
-    elementMap.set(key, value);
+    collectionArr[collectionArr.length - 1].set(key, value);
 }
 
-export function clearRefMap() {
-    elementMap.clear();
+export function setCollection(map) {
+    collectionArr.push(map);
+}
+
+export function popColletion() {
+    collectionArr.pop();
+}
+
+export function setCurrentRefMap(map) {
+    currentMap = map;
 }
 
 export function useRefs() {
-    return deepCloneMap(elementMap);
+    return currentMap;
 }
 

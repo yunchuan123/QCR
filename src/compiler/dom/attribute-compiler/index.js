@@ -1,6 +1,6 @@
 import { setPrefix } from "../variable-name/index.js";
 import { CustomAttributeArr, CustomAttribute } from "./custom/custom-attribute.js";
-
+import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
 
 /**
  *  将attributes转换为json
@@ -9,13 +9,15 @@ import { CustomAttributeArr, CustomAttribute } from "./custom/custom-attribute.j
 export default function (attributes = []) {
     let objContent = "";
     attributes.forEach((item) => {
+        if (getProcessing() === PROCESSING_STATE.FOR && ["ref", ":ref"].includes(item.name)) {
+            throw new Error("请勿将ref定义在b-for子元素上");
+        }
         if (CustomAttributeArr.includes(item.name)) {
             switch (item.name) {
                 case CustomAttribute.CLICK:
                     objContent += `onClick: ${setPrefix(item.value)},`;
                     break;
             }
-
             return;
         }
         if (isReactiveAttribute(item.name)) {
