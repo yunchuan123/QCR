@@ -22,7 +22,6 @@ export function loader(options) {
             }
             let code = readFileSync(filename).toString();
             code = await parse(code, getNameByPath(filename));
-            console.log(code);
             return {
                 code,
                 map: { mappings: "" }

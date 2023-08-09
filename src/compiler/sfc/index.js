@@ -4,6 +4,7 @@ import { parseScript, extractImportStatement, removeImport } from "../script/ind
 import { kebabToPascalCase } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "./utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
+import Log from "../utils/log.js";
 
 const styleRegex = /<style.*?>([\s\S]*?)<\/style>/i;
 const scriptRegex = /<script.*?>([\s\S]*?)<\/script>/i;
@@ -81,15 +82,21 @@ function baseParser(node) {
         const part = node.parts[PART_TYPE[key]];
         switch (PART_TYPE[key]) {
             case PART_TYPE.SCRIPT:
+                Log.default(`开始编译 ------ ${filename} ------ javascript`)
                 result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code));
                 const code = removeImport(part.code);
                 result[PART_TYPE.SCRIPT] = parseScript(code);
+                Log.success('开始编译 ---- javascript ------ success')
                 break;
             case PART_TYPE.STYLE:
+                Log.default(`开始编译 ------ ${filename} ---- style`)
                 result[PART_TYPE.STYLE] = lessParser(part.code);
+                Log.success('开始编译 ---- style ------ success')
                 break;
             case PART_TYPE.TEMPLATE:
+                Log.default(`开始编译 ------ ${filename} ---- template`)
                 result[PART_TYPE.TEMPLATE] = templateParser(`<template>${part.code}</template>`);
+                Log.success('开始编译 ---- template ------ success')
                 break;
         }
     })
