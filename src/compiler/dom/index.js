@@ -4,7 +4,7 @@ import {isReactiveTemplate, processTemplate, generateEffectStatement} from "./re
 import {setImportPackageSet } from "../sfc/utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
 import { setCacheVariableName } from "./variable-name/index.js";
-import { changeProcessing, getProcessing, PROCESSING_STATE } from "./processing/index.js";
+import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";
 import { setPrefix } from "./variable-name/index.js";
 
 function isStringAllWhitespace(str) {
@@ -55,6 +55,7 @@ function processNodeChildren(nodes = []) {
             setCacheVariableName(forObject.value.variableName); // 在处理子元素之前，应当把当前元素的for变量压入栈中
             changeProcessing(PROCESSING_STATE.FOR); // 通知程序目前正在处理for循环
             const renderItem = defaultProcess(node);
+            resetProcessing(); // 取消for循环状态
             return generateForDomStatement(forObject.value, renderItem);
         }
         return defaultProcess(node);
@@ -93,7 +94,6 @@ function defaultProcess(node) {
  */
 function generateCreateDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_DOM);
-    setImportPackageSet(PackageName.REACTIVE);
     if (!children) {
         return `{ type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
     }

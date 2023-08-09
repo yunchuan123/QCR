@@ -44,6 +44,7 @@ async function generateExportStatement(code) {
  */
 export function parse(code, _filename) {
     filename = _filename;
+    Log.default(`开始编译 ===================================================== ${filename}`)
     // Match and capture the style part
     const styleMatches = styleRegex.exec(code);
     const stylePart = styleMatches ? styleMatches[1].trim() : '';

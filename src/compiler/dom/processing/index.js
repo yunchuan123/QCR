@@ -17,3 +17,7 @@ export function changeProcessing(state) {
 export function getProcessing() {
     return processing;
 }
+
+export function resetProcessing() {
+    processing = "default";
+}
