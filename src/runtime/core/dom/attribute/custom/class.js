@@ -25,6 +25,8 @@ export const classAttributeHandler = {
                         classList.push(key);
                     }
                 })
+            } else if (isString(_value)) {
+                classList.push(_value);
             }
             el.className = classList.join(" ");
         })

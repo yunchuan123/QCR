@@ -27,7 +27,6 @@ export const vifAttributeHandler = {
                 } else if (!res && _parentElement.contains(_el)) {
                     _parentElement.insertBefore(_temp_div, _el);
                     _parentElement.removeChild(_el);
-                    
                 }
             })
         })
