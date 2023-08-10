@@ -14,8 +14,6 @@ export const vifAttributeHandler = {
         const _temp_div = document.createElement("div");
         _temp_div.style.display = "none";
 
-        const _renderFn = getRenderFn();
-
         effect(() => {
             Promise.resolve(value()).then((res) => {
                 _parentElement = _parentElement || _el.parentElement;

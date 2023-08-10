@@ -33,6 +33,7 @@ export function createDom(tagName, attr, children) {
         if (compilerAttribute[key]) {
             const compiler = compilerAttribute[key];
             compiler.handler(params);
+            return;
         }
         // 创建响应式attribute
         if (typeof value === "function") {

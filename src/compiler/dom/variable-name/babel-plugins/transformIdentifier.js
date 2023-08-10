@@ -1,5 +1,4 @@
 import { setPrefix } from "../index.js";
-import babel from "@babel/core";
 
 /**
  * babel插件 编译 :class 文件

@@ -66,7 +66,7 @@ export default function (attributes = []) {
 }
 
 function defineAttributeType(attr) {
-    if (isDirect(attr)) {
+    if (isCustom(attr)) {
         return { type: AttrType.CUSTOM, attr }
     } else if (isReactiveAttribute(attr)) {
         return { type: AttrType.REACTIVE, attr }
@@ -75,7 +75,7 @@ function defineAttributeType(attr) {
     }
 }
 
-function isDirect(attr) {
+function isCustom(attr) {
     return !!CustomAttributeArr.includes(attr.name);
 }
 
