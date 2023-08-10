@@ -1,3 +1,5 @@
+import { isString } from "../../../../utils/general.js"
+
 const collectionArr = [];
 let currentMap = undefined;
 
@@ -21,3 +23,12 @@ export function useRefs() {
     return currentMap;
 }
 
+export const refAttributeHandler = {
+    name: "ref",
+    handler({ el, value }) {
+        if (!isString(value)) {
+            throw new Error("ref must be a string");
+        }
+        setRefMap(value, el);
+    }
+}

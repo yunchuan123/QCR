@@ -16,7 +16,8 @@ export function renderList(arr, renderChildFn, el, arrStr) {
     let cache = [];
     effect(() => {
         let _cache = [];
-        const _documentFragment = document.createDocumentFragment()
+        const _documentFragment = document.createDocumentFragment();
+
         const elements = arr.map(renderChildFn);
         elements.forEach(_element => {
             const element = _element.renderFn();

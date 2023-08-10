@@ -15,7 +15,6 @@ export function transformIdentifier() {
                 }
             },
             MemberExpression(path) {
-                console.log(path.node);
                 if (path.node.object.type === "Identifier") {
                     path.node.object.name = setPrefix(path.node.object.name);
                 }

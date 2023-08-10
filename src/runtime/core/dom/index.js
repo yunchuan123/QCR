@@ -1,8 +1,7 @@
 import TagName from "./constant/tag-name.js";
 import {effect} from "@vue/reactivity";
 import { createEffectAttribute } from "./attribute/effect-attribute.js";
-import { setRefMap } from "./attribute/ref.js";
-import { isString } from "../../utils/general.js";
+import register from "./attribute/custom/index.js";
 
 /**
  * 解析sfc后解析出的script、template、style
@@ -10,6 +9,14 @@ import { isString } from "../../utils/general.js";
  * @property {Part[]} parts
  */
 
+
+const compilerAttribute = {};
+
+export function registerCompilerAttribute(attributeHandler) {
+    compilerAttribute[attributeHandler.name] = attributeHandler;
+}
+
+register(); // 注册所有处理器
 
 /**
  *
@@ -22,22 +29,21 @@ export function createDom(tagName, attr, children) {
     const el = document.createElement(tagName);
     Object.keys(attr).forEach(key => {
         const value = attr[key];
-        // 处理ref
-        if (key === "ref") {
-            if (!isString(value)) {
-                throw new Error("ref must be a string");
-            }
-            setRefMap(value, el);
+        const params = { el, value }
+        if (compilerAttribute[key]) {
+            const compiler = compilerAttribute[key];
+            compiler.handler(params);
         }
-
+        // 创建响应式attribute
         if (typeof value === "function") {
             createEffectAttribute(el, key, value);
         } else {
             el.setAttribute(key, value);
         }
     });
+    // 开始清理children
     if (Array.isArray(children)) {
-        children.forEach(element => {
+        children.forEach((element) => {
             switch (element.type) {
                 case "defaultDom":
                     el.appendChild(element.renderFn());
@@ -68,4 +74,4 @@ export function createEffectDom(tagName, attr, children ) {
 
 
 export { renderList } from "./attribute/render-for.js";
-export { useRefs } from "./attribute/ref.js";
+export { useRefs } from "./attribute/custom/ref.js";

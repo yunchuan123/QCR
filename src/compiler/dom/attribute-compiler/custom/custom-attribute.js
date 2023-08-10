@@ -1,10 +1,11 @@
 export const CustomAttribute = {
-    FOR: "b-for",
-    IF: "b-if",
-    CLICK: "@click"
+    FOR: "v-for",
+    IF: "v-if",
+    CLICK: "@click",
+    ELSE: "v-else",
 }
 
-export const CustomAttributeArr = ["b-for", "b-if", "@click"];
+export const CustomAttributeArr = [CustomAttribute.FOR, CustomAttribute.IF, CustomAttribute.CLICK, CustomAttribute.ELSE];
 
 
 

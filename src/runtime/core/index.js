@@ -1,6 +1,6 @@
 import { onMountedRun, collectionMountedFn } from "./lifrcycle/mounted.js";
 import { setInstance, clearInstance } from "./instance/index.js";
-import { setCollection, popColletion, setCurrentRefMap } from "./dom/attribute/ref.js";
+import { setCollection, popColletion, setCurrentRefMap } from "./dom/attribute/custom/ref.js";
 
 export function _carRender(tree) {
     return tree.renderFn();
@@ -51,6 +51,10 @@ export class CustomElement extends HTMLElement {
         _options.detail.data = value;
         const event = new CustomEvent(name, _options);
         this.dispatchEvent(event);
+    }
+
+    $listen(eventName, fn) {
+        this.addEventListener(eventName, (el) => fn)
     }
 }
 

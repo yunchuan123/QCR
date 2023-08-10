@@ -1,47 +1,95 @@
 import { setPrefix } from "../variable-name/index.js";
-import { CustomAttributeArr, CustomAttribute } from "./custom/custom-attribute.js";
+import { CustomAttributeArr } from "./custom/custom-attribute.js";
 import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
-import { processClickAttribute } from "./custom/click.js";
+import ObjectUtils from "../../utils/object-utils.js";
+import register from "./custom/index.js";
+
+const AttrType = {
+    REACTIVE: "reactive",
+    DEFAULT: "default",
+    CUSTOM: "custom"
+}
+
+const attributeCompiler = {};
+
+export function registerAttributeCompiler(_attributeCompiler) {
+    attributeCompiler[_attributeCompiler.name] = _attributeCompiler;
+}
+
+register(); // 注册所有处理器
+
+function check(items) {
+    let hasFor = false;
+    let hasIf = false;
+
+    items.forEach((item) => {
+        if (getProcessing() === PROCESSING_STATE.FOR && ["ref", ":ref"].includes(item.name)) {
+            throw new Error("请勿将ref定义在b-for子元素上");
+        }
+        if (item.name === "v-for") {
+            hasFor = true;
+        }
+        if (item.name === "v-if") {
+            hasIf = true;
+        }
+        if (hasFor && hasIf) {
+            throw new Error("请勿将v-if定义在v-for子元素上");
+        }
+    })
+    
+}
 
 /**
  *  将attributes转换为json
  * @param {{name: string, value: string}[]} attributes
  */
 export default function (attributes = []) {
-    let objContent = "";
+    let result = [];
+    check(attributes) // 检查attribute的合法性
     attributes.forEach((item) => {
-        if (getProcessing() === PROCESSING_STATE.FOR && ["ref", ":ref"].includes(item.name)) {
-            throw new Error("请勿将ref定义在b-for子元素上");
-        }
-        if (CustomAttributeArr.includes(item.name)) {
-            switch (item.name) {
-                case CustomAttribute.CLICK:
-                    objContent += `${processClickAttribute(item.value)},`;
-                    break;
-            }
-            return;
-        }
-        if (isReactiveAttribute(item.name)) {
-            objContent += generateEffectStatement(item)
-        } else {
-            objContent += `${item.name}: '${item.value}',`
+        const attrVo = defineAttributeType(item);
+        switch (attrVo.type) {
+            case AttrType.CUSTOM:
+                if (ObjectUtils.hasKey(attributeCompiler, item.name)) {
+                    result.push(attributeCompiler[item.name].handler(attrVo));
+                }
+                break;
+            case AttrType.REACTIVE:
+                result.push(generateEffectStatement(item));
+                break;
+            case AttrType.DEFAULT:
+                result.push(`'${item.name}': '${item.value}'`);
+                break;
         }
     });
-    objContent = objContent.slice(0, -1);
-    return `{${objContent}}`;
+    return `{${result.toString()}}`;
+}
+
+function defineAttributeType(attr) {
+    if (isDirect(attr)) {
+        return { type: AttrType.CUSTOM, attr }
+    } else if (isReactiveAttribute(attr)) {
+        return { type: AttrType.REACTIVE, attr }
+    } else {
+        return { type: AttrType.DEFAULT, attr }
+    }
+}
+
+function isDirect(attr) {
+    return !!CustomAttributeArr.includes(attr.name);
 }
 
 /**
  *  确认是否为响应式属性
- * @param {string} attr
+ * @param {{[name: string]: [value: string]}} attr
  * @returns {boolean}
  */
 function isReactiveAttribute(attr) {
-    return attr.startsWith(":");
+    return attr.name.startsWith(":");
 }
 
 function generateEffectStatement(attr) {
-    return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}},`
+    return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}}`
 }
 
 
