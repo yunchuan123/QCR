@@ -1,4 +1,4 @@
-import ArrayUtils from "../../../utils/array-utils.js";
+import ArrayUtils from "../../../../utils/array-utils.js";
 import { CustomAttribute } from "../../../../constant/attribute-name.js";
 import { trimString } from "../../../../utils/string-utils.js";
 

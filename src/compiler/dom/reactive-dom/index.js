@@ -1,6 +1,6 @@
-import ArrayUtils from "../../utils/array-utils.js";
+import ArrayUtils from "../../../utils/array-utils.js";
 import { getProcessing, PROCESSING_STATE } from "../processing/index.js";
-import { setImportPackageSet } from "../../sfc/utils/import-packages-utils.js";
+import { setImportPackageSet } from "../../utils/import-packages-utils.js";
 import PackageName from "../../constant/package-name.js";
 import { setPrefix, variableInCache } from "../variable-name/index.js";
 

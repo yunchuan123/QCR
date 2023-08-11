@@ -2,7 +2,7 @@ import lessParser from "../style/index.js";
 import templateParser from "../dom/index.js";
 import { parseScript, extractImportStatement, removeImport } from "../script/index.js";
 import { kebabToPascalCase } from "../utils/filename-utils.js";
-import { generatePackagesStatement, setImportPackageSet, importArrToString } from "./utils/import-packages-utils.js";
+import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
 import Log from "../utils/log.js";
 import { trimString } from "../../utils/string-utils.js";

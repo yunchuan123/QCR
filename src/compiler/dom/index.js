@@ -1,7 +1,7 @@
 import {parse} from "parse5";
 import compilerAttribute, { findFor } from "./attribute-compiler/index.js";
 import {isReactiveTemplate, processTemplate, generateEffectStatement} from "./reactive-dom/index.js";
-import {setImportPackageSet } from "../sfc/utils/import-packages-utils.js";
+import {setImportPackageSet } from "../utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
 import { removeCacheVariable, setCacheVariableName } from "./variable-name/index.js";
 import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";

@@ -1,7 +1,7 @@
 import { setPrefix } from "../variable-name/index.js";
 import { CustomAttributeArr } from "../../../constant/attribute-name.js";
 import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
-import ObjectUtils from "../../utils/object-utils.js";
+import ObjectUtils from "../../../utils/object-utils.js";
 import register from "./custom/index.js";
 import { processEventHandler } from "./custom/event.js";
 
