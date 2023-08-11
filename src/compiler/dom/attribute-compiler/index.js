@@ -3,11 +3,13 @@ import { CustomAttributeArr } from "../../../constant/attribute-name.js";
 import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
 import ObjectUtils from "../../utils/object-utils.js";
 import register from "./custom/index.js";
+import { processEventHandler } from "./custom/event.js";
 
 const AttrType = {
     REACTIVE: "reactive",
     DEFAULT: "default",
-    CUSTOM: "custom"
+    CUSTOM: "custom",
+    Event: "event"
 }
 
 const attributeCompiler = {};
@@ -49,6 +51,9 @@ export default function (attributes = []) {
     attributes.forEach((item) => {
         const attrVo = defineAttributeType(item);
         switch (attrVo.type) {
+            case AttrType.EVENT:
+                result.push(processEventHandler(attrVo));
+                break;
             case AttrType.CUSTOM:
                 if (ObjectUtils.hasKey(attributeCompiler, item.name)) {
                     result.push(attributeCompiler[item.name].handler(attrVo));
@@ -66,7 +71,9 @@ export default function (attributes = []) {
 }
 
 function defineAttributeType(attr) {
-    if (isCustom(attr)) {
+    if (isEvent(attr)) {
+        return { type: AttrType.EVENT, attr}
+    } else if (isCustom(attr)) {
         return { type: AttrType.CUSTOM, attr }
     } else if (isReactiveAttribute(attr)) {
         return { type: AttrType.REACTIVE, attr }
@@ -77,6 +84,15 @@ function defineAttributeType(attr) {
 
 function isCustom(attr) {
     return !!CustomAttributeArr.includes(attr.name);
+}
+
+/**
+ * 是否为事件监听
+ * @param {{name: stirng, value: string}} attr 
+ * @returns 
+ */
+function isEvent(attr) {
+    return attr.name.startsWith("@");
 }
 
 /**

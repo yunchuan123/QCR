@@ -54,7 +54,7 @@ export class CustomElement extends HTMLElement {
     }
 
     $listen(eventName, fn) {
-        this.addEventListener(eventName, (el) => fn)
+        this.addEventListener(eventName, (e) => fn(e.detail.data))
     }
 }
 

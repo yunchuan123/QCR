@@ -1,3 +1,6 @@
+/**
+ * 通知全局目前在处理什么类型的元素
+ */
 export const PROCESSING_STATE = {
     DEFAULT: "default",
     FOR: "for"

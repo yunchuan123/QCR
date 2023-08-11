@@ -63,12 +63,18 @@ function processNodeChildren(nodes = []) {
     return `[${childrenStatement.toString()}]`;
 }
 
+/**
+ * 默认的处理函数
+ * @param {HTMLElement} node 
+ * @returns 
+ */
 function defaultProcess(node) {
     let _childrenStatement = "undefined";
     if (node.childNodes?.length > 0) {
         _childrenStatement = processNodeChildren(node.childNodes);
     }
     if (node.nodeName === "#text") {
+        // 处理空白文本
         if (!node.value || isStringAllWhitespace(node.value)) {
             return undefined;
         } else {
@@ -80,6 +86,7 @@ function defaultProcess(node) {
                     return generateCreateEffectDomStatement(node.nodeName, node.attrs, _childrenStatement);
                 }
             }
+            // 非响应式变量
             _childrenStatement = `'${node.value}'`;
         }
     }
@@ -100,7 +107,13 @@ function generateCreateDomStatement(tagName, attrs, children) {
     return `{ type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children}); }}`;
 }
 
-
+/**
+ * 生成创建副作用dom元素的语句
+ * @param {string} tagName 
+ * @param {string} attrs 
+ * @param {string} children 
+ * @returns 
+ */
 function generateCreateEffectDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_EFFECT_DOM);
     if (getProcessing() === PROCESSING_STATE.FOR) {
@@ -109,6 +122,12 @@ function generateCreateEffectDomStatement(tagName, attrs, children) {
     return `{ type: 'reactiveDom', renderFn: () => { return ${PackageName.CREATE_EFFECT_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
 }
 
+/**
+ * 生成for循环语句
+ * @param {{listName: string, variableName: string}} forObject 
+ * @param {string} children 
+ * @returns 
+ */
 function generateForDomStatement(forObject, children) {
     setImportPackageSet(PackageName.RENDER_LIST);
     return `{ type: 'for', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;

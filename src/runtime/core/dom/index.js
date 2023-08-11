@@ -2,6 +2,7 @@ import TagName from "./constant/tag-name.js";
 import {effect} from "@vue/reactivity";
 import { createEffectAttribute } from "./attribute/effect-attribute.js";
 import register from "./attribute/custom/index.js";
+import { createEventAttribute } from "./attribute/event.js";
 
 /**
  * 解析sfc后解析出的script、template、style
@@ -30,13 +31,15 @@ export function createDom(tagName, attr, children) {
     Object.keys(attr).forEach(key => {
         const value = attr[key];
         const params = { el, value }
-        if (compilerAttribute[key]) {
+        if (isEvent(key)) {
+            // 创建事件
+            createEventAttribute(el, key, value);
+        } else if (compilerAttribute[key]) {
             const compiler = compilerAttribute[key];
             compiler.handler(params);
             return;
-        }
-        // 创建响应式attribute（如果属性以:开头证明为响应式属性）
-        if (typeof value === "function" && key.startsWith(":")) {
+        } else if (typeof value === "function" && key.startsWith(":")) {
+            // 创建响应式attribute（如果属性以:开头证明为响应式属性）
             createEffectAttribute(el, key, value);
         } else {
             el.setAttribute(key, value);
@@ -71,6 +74,15 @@ export function createEffectDom(tagName, attr, children ) {
     const el = createDom(tagName, attr, children);
     effect(() => { children(el) });
     return el;
+}
+
+/**
+ * 判断是否为事件
+ * @param {string} name 
+ * @returns 
+ */
+function isEvent(name) {
+    return name.startsWith("@");
 }
 
 
