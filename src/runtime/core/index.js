@@ -12,6 +12,18 @@ const defaultEventOptions = {
     detail: { data: undefined }
 }
 
+HTMLElement.prototype.$emit = function(name, value, options = {}) {
+    const _options = Object.assign(defaultEventOptions, options);
+    _options.detail.data = value;
+    const event = new CustomEvent(name, _options);
+    this.dispatchEvent(event);
+};
+
+HTMLElement.prototype.$listen = function(eventName, fn) {
+    this.addEventListener(eventName, (e) => fn(e.detail.data))
+}
+
+
 export class CustomElement extends HTMLElement {
     constructor() {
         super();
@@ -45,16 +57,6 @@ export class CustomElement extends HTMLElement {
 
         // 弹出refs收集器 todo：待优化
         popColletion();
-    }
-    $emit(name, value, options = {}) {
-        const _options = Object.assign(defaultEventOptions, options);
-        _options.detail.data = value;
-        const event = new CustomEvent(name, _options);
-        this.dispatchEvent(event);
-    }
-
-    $listen(eventName, fn) {
-        this.addEventListener(eventName, (e) => fn(e.detail.data))
     }
 }
 
