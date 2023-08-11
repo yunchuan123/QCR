@@ -1,4 +1,4 @@
-import { CustomAttribute } from "./custom-attribute.js";
+import { CustomAttribute } from "../../../../constant/attribute-name.js";
 import { replaceVariablesUsingStateMachine } from "../../variable-name/index.js";
 
 export const classAttributeHandler = {

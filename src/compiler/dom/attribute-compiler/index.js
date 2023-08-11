@@ -1,5 +1,5 @@
 import { setPrefix } from "../variable-name/index.js";
-import { CustomAttributeArr } from "./custom/custom-attribute.js";
+import { CustomAttributeArr } from "../../../constant/attribute-name.js";
 import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
 import ObjectUtils from "../../utils/object-utils.js";
 import register from "./custom/index.js";
@@ -93,5 +93,4 @@ function generateEffectStatement(attr) {
 }
 
 
-export { CustomAttribute } from "./custom/custom-attribute.js";
 export { findFor } from "./custom/for.js";

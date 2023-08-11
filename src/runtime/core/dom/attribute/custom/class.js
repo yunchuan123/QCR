@@ -1,8 +1,9 @@
 import { effect } from "@vue/reactivity"
-import { isArray, isObject, isString } from "../../../../utils/general"
+import { isArray, isObject, isString } from "../../../../utils/general";
+import { CustomAttribute } from "../../../../../constant/attribute-name";
 
 export const classAttributeHandler = {
-    name: ":class",
+    name: CustomAttribute.CLASS,
     handler({ el, value }) {
         effect(() => {
             const _value = value();

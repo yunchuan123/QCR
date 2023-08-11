@@ -35,8 +35,8 @@ export function createDom(tagName, attr, children) {
             compiler.handler(params);
             return;
         }
-        // 创建响应式attribute
-        if (typeof value === "function") {
+        // 创建响应式attribute（如果属性以:开头证明为响应式属性）
+        if (typeof value === "function" && key.startsWith(":")) {
             createEffectAttribute(el, key, value);
         } else {
             el.setAttribute(key, value);

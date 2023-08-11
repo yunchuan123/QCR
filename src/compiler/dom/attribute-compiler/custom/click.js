@@ -1,6 +1,6 @@
 import { replaceVariablesUsingStateMachine } from "../../variable-name/index.js";
 import { setPrefix } from "../../variable-name/index.js";
-import { CustomAttribute } from "./custom-attribute.js";
+import { CustomAttribute } from "../../../../constant/attribute-name.js";
 
 export function processClickAttribute(content) {
     if (content.includes("(")) {

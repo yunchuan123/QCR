@@ -1,5 +1,5 @@
 import ArrayUtils from "../../../utils/array-utils.js";
-import { CustomAttribute } from "./custom-attribute.js";
+import { CustomAttribute } from "../../../../constant/attribute-name.js";
 
 const  FOR_EXPRESSION = /(\w+)\sin\s((?:\w+\.?)+)/;
 

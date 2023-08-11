@@ -1,4 +1,5 @@
-import { isString } from "../../../../utils/general.js"
+import { isString } from "../../../../utils/general.js";
+import { CustomAttribute } from "../../../../../constant/attribute-name.js";
 
 const collectionArr = [];
 let currentMap = undefined;
