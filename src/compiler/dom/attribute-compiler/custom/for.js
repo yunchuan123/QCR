@@ -1,16 +1,18 @@
 import ArrayUtils from "../../../utils/array-utils.js";
 import { CustomAttribute } from "../../../../constant/attribute-name.js";
 
-const  FOR_EXPRESSION = /(\w+)\sin\s((?:\w+\.?)+)/;
-
 export function extractVariables(code) {
-    const matches = code.match(FOR_EXPRESSION);
+    if (!code.includes(" in ")) { throw new Error("请检查v-for语法是否正确"); }
+    const matches = code.split(" in ");
     if (ArrayUtils.isNotEmpty(matches)) {
-        const variableName = matches[1];
-        const listName = matches[2];
-        return { variableName, listName };
+        const variableName = matches[0].trim();
+        const listName = matches[1].trim();
+        if (variableName.includes("(")) {
+            return { variableName: variableName.replace(/\(|\)/g, "").trim(), listName: listName.trim() };
+        }
+        return { variableName: variableName.trim(), listName: listName.trim() };
     } else {
-        throw new Error("There is an error in the configuration of the b-for attribute");
+        throw new Error("There is an error in the configuration of the v-for attribute");
     }
 }
 

@@ -3,7 +3,7 @@ import compilerAttribute, { findFor } from "./attribute-compiler/index.js";
 import {isReactiveTemplate, processTemplate, generateEffectStatement} from "./reactive-dom/index.js";
 import {setImportPackageSet } from "../sfc/utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
-import { setCacheVariableName } from "./variable-name/index.js";
+import { removeCacheVariable, setCacheVariableName } from "./variable-name/index.js";
 import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";
 import { setPrefix } from "./variable-name/index.js";
 
@@ -52,10 +52,25 @@ function processNodeChildren(nodes = []) {
         }
         const forObject = findFor(node.attrs);
         if (forObject.found) {
-            setCacheVariableName(forObject.value.variableName); // 在处理子元素之前，应当把当前元素的for变量压入栈中
+            let variableNames;
+            console.log(forObject.value.variableName);
+            // 如果是多个变量，例如：(item, index) in list
+            if (forObject.value.variableName.includes(",")) {
+                variableNames = forObject.value.variableName.split(",").map(item => item.trim());
+            } else {
+                variableNames = [forObject.value.variableName.trim()];
+            }
+            // 将变量名加入到缓存中
+            variableNames.forEach(variableName => {
+                setCacheVariableName(variableName.trim());
+            })
             changeProcessing(PROCESSING_STATE.FOR); // 通知程序目前正在处理for循环
             const renderItem = defaultProcess(node);
             resetProcessing(); // 结束for循环状态
+            // 将变量名从缓存中移除
+            variableNames.forEach(variableName => {
+                removeCacheVariable(variableName.trim());
+            });
             return generateForDomStatement(forObject.value, renderItem);
         }
         return defaultProcess(node);
