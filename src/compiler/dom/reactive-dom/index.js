@@ -7,6 +7,11 @@ import { setPrefix, variableInCache } from "../variable-name/index.js";
 const TEMPLATE_VALUE = /{{\s*(.*?)\s*}}/g;
 const TEMPLATE_CONTENT = /{{\s*(.*?)\s*}}/;
 
+/**
+ * 确认元素是否为响应式模板
+ * @param {string} content 
+ * @returns 
+ */
 export function isReactiveTemplate(content) {
     return TEMPLATE_VALUE.test(content);
 }

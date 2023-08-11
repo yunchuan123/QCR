@@ -5,6 +5,7 @@ import { kebabToPascalCase } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "./utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
 import Log from "../utils/log.js";
+import { trimString } from "../../utils/string-utils.js";
 
 const styleRegex = /<style.*?>([\s\S]*?)<\/style>/i;
 const scriptRegex = /<script.*?>([\s\S]*?)<\/script>/i;
@@ -44,18 +45,18 @@ async function generateExportStatement(code) {
  */
 export function parse(code, _filename) {
     filename = _filename;
-    Log.default(`开始编译 ===================================================== ${filename}`)
+    Log.info(`开始编译 ===================================================== ${filename}`)
     // Match and capture the style part
     const styleMatches = styleRegex.exec(code);
-    const stylePart = styleMatches ? styleMatches[1].trim() : '';
+    const stylePart = styleMatches ? trimString(styleMatches[1]) : '';
 
     // Match and capture the script part
     const scriptMatches = scriptRegex.exec(code);
-    const scriptPart = scriptMatches ? scriptMatches[1].trim() : '';
+    const scriptPart = scriptMatches ? trimString(scriptMatches[1]) : '';
 
     // Match and capture the template part
     const templateMatches = templateRegex.exec(code);
-    const templatePart = templateMatches ? templateMatches[1].trim() : '';
+    const templatePart = templateMatches ? trimString(templateMatches[1]) : '';
     const parts = {
         [PART_TYPE.SCRIPT]: {code: scriptPart, type: "script"},
         [PART_TYPE.STYLE]: {code: stylePart, type: "style"},
@@ -83,19 +84,19 @@ function baseParser(node) {
         const part = node.parts[PART_TYPE[key]];
         switch (PART_TYPE[key]) {
             case PART_TYPE.SCRIPT:
-                Log.default(`开始编译 ------ ${filename} ------ javascript`)
+                Log.info(`开始编译 ------ ${filename} ------ javascript`)
                 result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code));
                 const code = removeImport(part.code);
                 result[PART_TYPE.SCRIPT] = parseScript(code);
-                Log.success('开始编译 ---- javascript ------ success')
+                Log.success('编译完成 ---- javascript ------ success')
                 break;
             case PART_TYPE.STYLE:
-                Log.default(`开始编译 ------ ${filename} ---- style`)
+                Log.info(`开始编译 ------ ${filename} ---- style`)
                 result[PART_TYPE.STYLE] = lessParser(part.code);
-                Log.success('开始编译 ---- style ------ success')
+                Log.success('编译完成 ---- style ------ success')
                 break;
             case PART_TYPE.TEMPLATE:
-                Log.default(`开始编译 ------ ${filename} ---- template`)
+                Log.info(`开始编译 ------ ${filename} ---- template`)
                 result[PART_TYPE.TEMPLATE] = templateParser(`<template>${part.code}</template>`);
                 Log.success('开始编译 ---- template ------ success')
                 break;

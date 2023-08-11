@@ -6,7 +6,6 @@ export const PROCESSING_STATE = {
     FOR: "for"
 }
 
-
 let processing = "default";
 
 /**

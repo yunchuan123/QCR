@@ -1,7 +1,8 @@
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
 import "../dom/index.js";
-import babel from "@babel/core"
+import babel from "@babel/core";
+import { trimString } from "../../utils/string-utils.js";
 
 export function parseScriptVariables(code) {
     const ast = parse(code, { sourceType: "module" });
@@ -43,7 +44,7 @@ export function extractImportStatement(code) {
  */
 export function parseScript(code) {
     const variables = parseScriptVariables(code);
-    code = code.trim();
+    code = trimString(code);
     if (code.charAt(code.length - 1) !== ";") {
         code += ";"
     }

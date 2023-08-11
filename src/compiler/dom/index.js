@@ -6,6 +6,7 @@ import PackageName from "../constant/package-name.js";
 import { removeCacheVariable, setCacheVariableName } from "./variable-name/index.js";
 import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";
 import { setPrefix } from "./variable-name/index.js";
+import { trimString } from "../../utils/string-utils.js";
 
 function isStringAllWhitespace(str) {
     return /^\s*$/.test(str);
@@ -17,7 +18,7 @@ function isStringAllWhitespace(str) {
  * @returns {*}
  */
 function clearCode(code) {
-    return code.trim()
+    return trimString(code)
         .replace(/[\n\r\t]/g, "")
         .replace(/>[\s]+</g, "><");
 }
@@ -52,24 +53,24 @@ function processNodeChildren(nodes = []) {
         }
         const forObject = findFor(node.attrs);
         if (forObject.found) {
+            
             let variableNames;
-            console.log(forObject.value.variableName);
             // 如果是多个变量，例如：(item, index) in list
             if (forObject.value.variableName.includes(",")) {
-                variableNames = forObject.value.variableName.split(",").map(item => item.trim());
+                variableNames = forObject.value.variableName.split(",").map(item => trimString(item));
             } else {
-                variableNames = [forObject.value.variableName.trim()];
+                variableNames = [trimString(forObject.value.variableName)];
             }
             // 将变量名加入到缓存中
             variableNames.forEach(variableName => {
-                setCacheVariableName(variableName.trim());
+                setCacheVariableName(trimString(variableName));
             })
             changeProcessing(PROCESSING_STATE.FOR); // 通知程序目前正在处理for循环
             const renderItem = defaultProcess(node);
             resetProcessing(); // 结束for循环状态
             // 将变量名从缓存中移除
             variableNames.forEach(variableName => {
-                removeCacheVariable(variableName.trim());
+                removeCacheVariable(trimString(variableName));
             });
             return generateForDomStatement(forObject.value, renderItem);
         }
