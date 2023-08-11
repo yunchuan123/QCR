@@ -12,10 +12,16 @@ const defaultEventOptions = {
     detail: { data: undefined }
 }
 
+/**
+ * 
+ * @param {string} name 
+ * @param {any} value 
+ * @param {object} options 
+ */
 HTMLElement.prototype.$emit = function(name, value, options = {}) {
     const _options = Object.assign(defaultEventOptions, options);
     _options.detail.data = value;
-    const event = new CustomEvent(name, _options);
+    const event = new CustomEvent(name.toLowerCase(), _options);
     this.dispatchEvent(event);
 };
 
