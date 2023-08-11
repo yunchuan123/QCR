@@ -85,6 +85,10 @@ function processNodeChildren(nodes = []) {
  * @returns 
  */
 function defaultProcess(node) {
+    // 删除注释节点
+    if (node.nodeName === "#comment") {
+        return undefined;
+    }
     let _childrenStatement = "undefined";
     if (node.childNodes?.length > 0) {
         _childrenStatement = processNodeChildren(node.childNodes);
@@ -149,6 +153,11 @@ function generateForDomStatement(forObject, children) {
     return `{ type: 'for', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
 }
 
+/**
+ * 找到根节点
+ * @param {*} node 
+ * @returns 
+ */
 function traverse(node) {
     if (node.nodeName === "template") {
         return node.content.childNodes[0];

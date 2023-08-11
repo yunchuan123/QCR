@@ -28,7 +28,6 @@ export function generatePackagesStatement() {
     return `import {${packageStr}} from 'car'\n`;
 }
 
-
 /**
  *
  * @param {[]} imports

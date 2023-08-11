@@ -48,6 +48,9 @@ export function createDom(tagName, attr, children) {
     // 开始清理children
     if (Array.isArray(children)) {
         children.forEach((element) => {
+            if (!element) {
+                return;
+            } 
             switch (element.type) {
                 case "defaultDom":
                     el.appendChild(element.renderFn());
