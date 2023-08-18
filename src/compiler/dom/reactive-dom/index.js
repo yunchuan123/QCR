@@ -36,7 +36,7 @@ export function processTemplate(content) {
 }
 
 /**
- * 创建副作用函数
+ * 创建副作用函数语句
  * @param {string} prop
  * @returns {string}
  */

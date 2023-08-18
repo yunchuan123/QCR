@@ -7,8 +7,17 @@ import { removeCacheVariable, setCacheVariableName } from "./variable-name/index
 import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";
 import { setPrefix } from "./variable-name/index.js";
 import { trimString } from "../../utils/string-utils.js";
+import log from "../utils/log.js";
 
+/**
+ * 判断字符串是不是空字符（空格也算）
+ * @param {string} str 
+ * @returns 
+ */
 function isStringAllWhitespace(str) {
+    if(!str) {
+        return true;
+    }
     return /^\s*$/.test(str);
 }
 
@@ -30,6 +39,9 @@ function clearCode(code) {
  */
 export default function (code) {
     const node = parse(clearCode(code));
+    if (!node) {
+        log.error("没有找到根节点")
+    }
     const rootNode = traverse(node);
     return processNode(rootNode);
 }
@@ -53,7 +65,6 @@ function processNodeChildren(nodes = []) {
         }
         const forObject = findFor(node.attrs);
         if (forObject.found) {
-            
             let variableNames;
             // 如果是多个变量，例如：(item, index) in list
             if (forObject.value.variableName.includes(",")) {
@@ -65,9 +76,11 @@ function processNodeChildren(nodes = []) {
             variableNames.forEach(variableName => {
                 setCacheVariableName(trimString(variableName));
             })
-            changeProcessing(PROCESSING_STATE.FOR); // 通知程序目前正在处理for循环
+            // 通知程序目前正在处理for循环
+            changeProcessing(PROCESSING_STATE.FOR); 
             const renderItem = defaultProcess(node);
-            resetProcessing(); // 结束for循环状态
+            // 结束for循环状态
+            resetProcessing();
             // 将变量名从缓存中移除
             variableNames.forEach(variableName => {
                 removeCacheVariable(trimString(variableName));
@@ -76,7 +89,7 @@ function processNodeChildren(nodes = []) {
         }
         return defaultProcess(node);
     })
-    return `[${childrenStatement.toString()}]`;
+    return `[${ childrenStatement.toString() }]`;
 }
 
 /**
@@ -95,15 +108,15 @@ function defaultProcess(node) {
     }
     if (node.nodeName === "#text") {
         // 处理空白文本
-        if (!node.value || isStringAllWhitespace(node.value)) {
+        if (isStringAllWhitespace(node.value)) {
             return undefined;
         } else {
             // 处理模板语法中的响应式变量
             if (isReactiveTemplate(node.value)) {
                 const effectProp = processTemplate(node.value);
                 if (effectProp.matched) {
-                    _childrenStatement = generateEffectStatement(effectProp.value); // 创建副作用函数语句
-                    return generateCreateEffectDomStatement(node.nodeName, node.attrs, _childrenStatement);
+                    // 创建副作用函数语句
+                    return generateCreateEffectDomStatement(node.nodeName, node.attrs, generateEffectStatement(effectProp.value));
                 }
             }
             // 非响应式变量
@@ -120,7 +133,7 @@ function defaultProcess(node) {
  * @param {string}children
  */
 function generateCreateDomStatement(tagName, attrs, children) {
-    setImportPackageSet(PackageName.CREATE_DOM);
+    setImportPackageSet(PackageName.CREATE_DOM); // 设置要引入的包
     if (!children) {
         return `{ type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
     }
@@ -135,7 +148,7 @@ function generateCreateDomStatement(tagName, attrs, children) {
  * @returns 
  */
 function generateCreateEffectDomStatement(tagName, attrs, children) {
-    setImportPackageSet(PackageName.CREATE_EFFECT_DOM);
+    setImportPackageSet(PackageName.CREATE_EFFECT_DOM); // 设置要引入的包
     if (getProcessing() === PROCESSING_STATE.FOR) {
         return `{type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
     }
@@ -149,7 +162,7 @@ function generateCreateEffectDomStatement(tagName, attrs, children) {
  * @returns 
  */
 function generateForDomStatement(forObject, children) {
-    setImportPackageSet(PackageName.RENDER_LIST);
+    setImportPackageSet(PackageName.RENDER_LIST); // 设置要引入的包
     return `{ type: 'for', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
 }
 

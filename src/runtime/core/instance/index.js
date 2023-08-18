@@ -1,4 +1,4 @@
-import { getProcessing, PROCESSING  } from "../lifrcycle";
+import { getProcessing, PROCESSING  } from "../lifrcycle/index.js";
 
 let instance = undefined;
 

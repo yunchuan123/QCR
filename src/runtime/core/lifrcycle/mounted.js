@@ -1,4 +1,4 @@
-import { setProcessing, resetProcessing, PROCESSING } from ".";
+import { setProcessing, resetProcessing, PROCESSING } from "./index";
 
 //  todo：待优化
 let mountedCallBack = [];

@@ -35,10 +35,9 @@ function check(items) {
             hasIf = true;
         }
         if (hasFor && hasIf) {
-            throw new Error("请勿将v-if定义在v-for子元素上");
+            throw new Error("请勿将v-for和v-if定义在同一个元素身上");
         }
     })
-    
 }
 
 /**
@@ -104,6 +103,11 @@ function isReactiveAttribute(attr) {
     return attr.name.startsWith(":");
 }
 
+/**
+ * 生成副作用语句
+ * @param {{[key:string]:[value:string]}} attr 
+ * @returns 
+ */
 function generateEffectStatement(attr) {
     return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}}`
 }
