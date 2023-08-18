@@ -1,8 +1,10 @@
+import { setProcessing, resetProcessing, PROCESSING } from ".";
+
 //  todo：待优化
 let mountedCallBack = [];
 
 /**
- * 收集 mounted 回调函数
+ * mounted生命周期
  * @param {function} fn
  */
 export function onMounted(fn) {
@@ -24,8 +26,10 @@ export function collectionMountedFn() {
  * @param {function[]} fns 
  */
 export function onMountedRun(fns) {
+    setProcessing(PROCESSING.MOUNTED)
     while (fns.length > 0) {
         const fn = fns.pop();
         fn();
     }
+    resetProcessing();
 }
