@@ -33,6 +33,26 @@ function clearCode(code) {
 }
 
 /**
+ * 找到根节点
+ * @param {*} node 
+ * @returns 
+ */
+function traverse(node) {
+    if (node.nodeName === "template") {
+        return node.content.childNodes[0];
+    }
+    if (node.childNodes) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+            const result = traverse(node.childNodes[i]);
+            if (result) {
+                return result;
+            }
+        }
+    }
+}
+
+
+/**
  * 解析code
  * @param {string} code
  * @returns {string}
@@ -165,24 +185,4 @@ function generateForDomStatement(forObject, children) {
     setImportPackageSet(PackageName.RENDER_LIST); // 设置要引入的包
     return `{ type: 'for', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
 }
-
-/**
- * 找到根节点
- * @param {*} node 
- * @returns 
- */
-function traverse(node) {
-    if (node.nodeName === "template") {
-        return node.content.childNodes[0];
-    }
-    if (node.childNodes) {
-        for (let i = 0; i < node.childNodes.length; i++) {
-            const result = traverse(node.childNodes[i]);
-            if (result) {
-                return result;
-            }
-        }
-    }
-}
-
 

@@ -1,10 +1,10 @@
 import { basename } from "path";
 /**
- *
+ * 通过文件名创建类名
  * @param {string} str
  * @returns {*}
  */
-export function kebabToPascalCase(str) {
+export function generateClassNameByFileName(str) {
     return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }
 

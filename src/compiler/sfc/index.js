@@ -1,7 +1,7 @@
 import lessParser from "../style/index.js";
 import templateParser from "../dom/index.js";
 import { parseScript, extractImportStatement, removeImport } from "../script/index.js";
-import { kebabToPascalCase } from "../utils/filename-utils.js";
+import { generateClassNameByFileName } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
 import Log from "../utils/log.js";
@@ -21,17 +21,26 @@ const PART_TYPE = {
 let filename = "";
 
 /**
+ * 生成import语句
+ * @returns {string} import语句
+ */
+function generateImportPackagesStatement() {
+    setImportPackageSet(PackageName.CAR_RENDER);
+    setImportPackageSet(PackageName.CUSTOM_ELEMENT);
+    return generatePackagesStatement();
+}
+
+/**
  * 生成代码包装
  * @param content
  * @returns {string}
  */
 async function generateExportStatement(code) {
-    setImportPackageSet(PackageName.CAR_RENDER);
-    setImportPackageSet(PackageName.CUSTOM_ELEMENT);
-    let importStatement = generatePackagesStatement();
+    // 生成import语句
+    let importStatement = generateImportPackagesStatement();
     importStatement += code[PART_TYPE.IMPORT];
-
-    const className = kebabToPascalCase(filename);
+    // 根据文件名创建类名-定义自定义元素
+    const className = generateClassNameByFileName(filename);
     const defineStatement = `window.customElements.define('${filename}', ${className})`;
     const content = `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {\n setup() {\n${code[PART_TYPE.SCRIPT]}\n}\n render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} \n ${await code[PART_TYPE.STYLE]}\n}; \n`;
     return importStatement + content + defineStatement;
@@ -45,7 +54,7 @@ async function generateExportStatement(code) {
  */
 export function parse(code, _filename) {
     filename = _filename;
-    Log.info(`开始编译 ===================================================== ${filename}`)
+    Log.info(`开始编译 ===================================================== ${filename}.vue`)
     // Match and capture the style part
     const styleMatches = styleRegex.exec(code);
     const stylePart = styleMatches ? trimString(styleMatches[1]) : '';
@@ -75,30 +84,31 @@ export function parse(code, _filename) {
 
 /**
  * SfcNode
- * @param node
- * @returns {string}
+ * @param node 三个节点
+ * @returns {string} 最终代码
  */
 function baseParser(node) {
     const result = { css: "", script: "", template: "", _import: "" };
     Object.keys(PART_TYPE).forEach(key => {
         const part = node.parts[PART_TYPE[key]];
+        // 分别处理javascript、css、html
         switch (PART_TYPE[key]) {
             case PART_TYPE.SCRIPT:
                 Log.info(`开始编译 ------ ${filename} ------ javascript`)
                 result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code));
                 const code = removeImport(part.code);
                 result[PART_TYPE.SCRIPT] = parseScript(code);
-                Log.success('编译完成 ---- javascript ------ success')
+                Log.success('编译完成 ------ javascript ------ success')
                 break;
             case PART_TYPE.STYLE:
-                Log.info(`开始编译 ------ ${filename} ---- style`)
+                Log.info(`开始编译 ------ ${filename} ------ style`)
                 result[PART_TYPE.STYLE] = lessParser(part.code);
-                Log.success('编译完成 ---- style ------ success')
+                Log.success('编译完成 ------ style ------ success')
                 break;
             case PART_TYPE.TEMPLATE:
-                Log.info(`开始编译 ------ ${filename} ---- template`)
+                Log.info(`开始编译 ------ ${filename} ------ template`)
                 result[PART_TYPE.TEMPLATE] = templateParser(`<template>${part.code}</template>`);
-                Log.success('开始编译 ---- template ------ success')
+                Log.success('开始编译 ------ template ------ success')
                 break;
         }
     })
@@ -106,7 +116,7 @@ function baseParser(node) {
 }
 
 /**
- *
+ * 组合最终代码
  * @param {{css: string, script: string, template: string}} result
  * @returns {string}
  */

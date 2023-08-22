@@ -41,7 +41,7 @@ function check(items) {
 }
 
 /**
- *  将attributes转换为json
+ *  将attributes转换为 kv 格式
  * @param {{name: string, value: string}[]} attributes
  */
 export default function (attributes = []) {
