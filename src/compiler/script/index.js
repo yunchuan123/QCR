@@ -28,6 +28,7 @@ export function parseScriptVariables(code) {
     const variables = [];
     traverse.default(ast, {
         enter(path) {
+            // 导出const、let、var声明的变量
             if (path.isVariableDeclaration()) {
                 const declarations = path.node.declarations;
                 declarations.forEach((declaration) => {
@@ -35,6 +36,7 @@ export function parseScriptVariables(code) {
                         pushVarNamrToArr(variables, declaration.id.name)
                     }
                 });
+            // 导出function声明的变量 
             } else if (path.isFunctionDeclaration()) {
                 pushVarNamrToArr(variables, path.node.id.name)
             }
