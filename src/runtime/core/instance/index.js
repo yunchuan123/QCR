@@ -1,4 +1,5 @@
 import { getProcessing, PROCESSING  } from "../lifrcycle/index.js";
+import log from "../../../utils/log.js";
 
 let instance = undefined;
 
@@ -16,7 +17,11 @@ export function getInstance() {
 
 export function useInstance() {
     if (getProcessing() === PROCESSING.MOUNTED) {
-        throw new Error("[CAR WARN]: 请不要在mounted中使用")
+        log.error("请不要在mounted中使用useInstance")
+    }
+    const instance = getInstance();
+    if (!instance) {
+        log.error("请不要在组件以外的地方使用useInstance")
     }
     return getInstance();
 }

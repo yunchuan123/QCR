@@ -4,7 +4,6 @@ import { replaceVariablesUsingStateMachine } from "../../variable-name/index.js"
 /**
  * 处理class属性
  */
-
 export const classAttributeHandler = {
     name: CustomAttribute.CLASS,
     handler(attrVo) {

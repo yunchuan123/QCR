@@ -3,6 +3,20 @@ import traverse from "@babel/traverse";
 import "../dom/index.js";
 import babel from "@babel/core";
 import { trimString } from "../../utils/string-utils.js";
+import log from "../../utils/log.js";
+
+/**
+ * 推送变量名到数组中
+ * @param {string[]} arr 
+ * @param {string} varName 
+ */
+function pushVarNamrToArr(arr, varName) {
+    if (arr.includes(varName)) {
+        log.error("请勿在文件中定义重复的变量名")
+    } else {
+        arr.push(varName);
+    }
+}
 
 /**
  * 解析出顶层的所有变量并导出
@@ -18,9 +32,11 @@ export function parseScriptVariables(code) {
                 const declarations = path.node.declarations;
                 declarations.forEach((declaration) => {
                     if (declaration.id.type === 'Identifier' && path.parent.type === "Program") {
-                        variables.push(declaration.id.name);
+                        pushVarNamrToArr(variables, declaration.id.name)
                     }
                 });
+            } else if (path.isFunctionDeclaration()) {
+                pushVarNamrToArr(variables, path.node.id.name)
             }
         }
     });

@@ -4,7 +4,7 @@ import { parseScript, extractImportStatement, removeImport } from "../script/ind
 import { generateClassNameByFileName } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
 import PackageName from "../constant/package-name.js";
-import Log from "../utils/log.js";
+import Log from "../../utils/log.js";
 import { trimString } from "../../utils/string-utils.js";
 
 const styleRegex = /<style.*?>([\s\S]*?)<\/style>/i;

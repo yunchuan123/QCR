@@ -28,11 +28,14 @@ register(); // 注册所有处理器
 export function createDom(tagName, attr, children) {
     if (tagName === TagName.TEXT) { return document.createTextNode(children) };
     const el = document.createElement(tagName);
+    /**
+     * 开始处理attribute
+     */
     Object.keys(attr).forEach(key => {
         const value = attr[key];
         const params = { el, value }
+        // 处理事件绑定
         if (isEvent(key)) {
-            // 创建事件
             createEventAttribute(el, key, value);
         } else if (compilerAttribute[key]) {
             const compiler = compilerAttribute[key];

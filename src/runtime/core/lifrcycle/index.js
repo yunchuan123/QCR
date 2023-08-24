@@ -1,5 +1,8 @@
 export * from "./mounted.js";
 
+/**
+ * 通知全局目前在什么生命周期阶段
+ */
 export const PROCESSING = {
     MOUNTED: "mounted"
 }

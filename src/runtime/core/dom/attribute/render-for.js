@@ -2,7 +2,7 @@ import { carError } from "../../../utils/error-utils.js";
 import { effect } from "@vue/reactivity";
 
 /**
- *
+ * 渲染v-for的元素
  * @param {[]} arr
  * @param {() => HTMLElement} renderChildFn
  * @param {HTMLElement} el
@@ -26,7 +26,7 @@ export function renderList(arr, renderChildFn, el, arrStr) {
         });
         const firstElement = cache[0];
         if (firstElement && firstElement.parentElement === el) {
-            el.insertBefore(_documentFragment, cache[0]);
+            el.insertBefore(_documentFragment, firstElement);
         } else {
             el.appendChild(_documentFragment);
         }

@@ -38,19 +38,28 @@ export class CustomElement extends HTMLElement {
         setCollection(refMap);
 
         // setup - setup期间会收集声明周期函数，然后在相应的时间回调
-        setInstance(this); // 设置this实例，方便useInstance调用
+
+        /**
+         * 这段代码也说明了, useInstance 只能在setup中使用
+         */
+
+        // 设置this实例，方便useInstance调用
+        setInstance(this);
         const context = this.setup();
-        clearInstance(); // 清除this实例，避免其他组件误用
+        // 清除this实例，避免其他组件误用
+        clearInstance();
 
         // 结束收集mounted回调
         const mountedFns = collectionMountedFn();
         const shadowRoot = this.attachShadow({mode: "open"});
         let element;
+
+        // render函数是编译模板自动生成的
         if (this.render) {
             element = _carRender(this.render(context));
         }
+        // style 函数也是编译模板自动生成的
         this.style && shadowRoot.appendChild(this.style());
-
         if (element) {
             shadowRoot.appendChild(element);
         }

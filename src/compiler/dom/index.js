@@ -7,7 +7,7 @@ import { removeCacheVariable, setCacheVariableName } from "./variable-name/index
 import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } from "./processing/index.js";
 import { setPrefix } from "./variable-name/index.js";
 import { trimString } from "../../utils/string-utils.js";
-import log from "../utils/log.js";
+import log from "../../utils/log.js";
 
 /**
  * 判断字符串是不是空字符（空格也算）

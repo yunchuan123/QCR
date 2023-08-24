@@ -1,7 +1,7 @@
 import { setPrefix } from "../index.js";
 
 /**
- * babel插件 编译 :class 文件
+ * babel插件 编译 :class 属性, 为了支持 class的 {} 和 [] 形式
  * @returns {{visitor: {Identifier(*): void}}}
  */
 export function transformIdentifier() {

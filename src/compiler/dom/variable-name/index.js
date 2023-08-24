@@ -1,6 +1,6 @@
 import babel from "@babel/core";
 import { transformIdentifier } from "./babel-plugins/transformIdentifier.js";
-import log from "../../utils/log.js";
+import log from "../../../utils/log.js";
 import { trimString } from "../../../utils/string-utils.js";
 
 /**
