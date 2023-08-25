@@ -34,17 +34,16 @@ export function createDom(tagName, attr, children) {
     Object.keys(attr).forEach(key => {
         const value = attr[key];
         const params = { el, value }
-        // 处理事件绑定
-        if (isEvent(key)) {
+        if (isEvent(key)) { // 处理事件绑定
             createEventAttribute(el, key, value);
-        } else if (compilerAttribute[key]) {
+        } else if (compilerAttribute[key]) { // 处理自定义的attribute
             const compiler = compilerAttribute[key];
             compiler.handler(params);
             return;
-        } else if (typeof value === "function" && key.startsWith(":")) {
+        } else if (typeof value === "function" && key.startsWith(":")) { // 处理响应式属性
             // 创建响应式attribute（如果属性以:开头证明为响应式属性）
             createEffectAttribute(el, key, value);
-        } else {
+        } else { // 处理普通类型的 attribute
             el.setAttribute(key, value);
         }
     });

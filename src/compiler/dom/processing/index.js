@@ -9,7 +9,7 @@ export const PROCESSING_STATE = {
 let processing = "default";
 
 /**
- *
+ * 切换processing的状态
  * @param {'default'|'for'} state
  */
 export function changeProcessing(state) {
