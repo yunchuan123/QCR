@@ -8,11 +8,12 @@ import { changeProcessing, getProcessing, PROCESSING_STATE, resetProcessing } fr
 import { setPrefix } from "./variable-name/index.js";
 import { trimString } from "../../utils/string-utils.js";
 import log from "../../utils/log.js";
+import { DOM_TYPE } from "../constant/dom-type.js";
 
 /**
  * 判断字符串是不是空字符（空格也算）
- * @param {string} str 
- * @returns 
+ * @param {string} str
+ * @returns
  */
 function isStringAllWhitespace(str) {
     if(!str) {
@@ -34,8 +35,8 @@ function clearCode(code) {
 
 /**
  * 找到根节点
- * @param {*} node 
- * @returns 
+ * @param {*} node
+ * @returns
  */
 function traverse(node) {
     if (node.nodeName === "template") {
@@ -97,7 +98,7 @@ function processNodeChildren(nodes = []) {
                 setCacheVariableName(trimString(variableName));
             })
             // 通知程序目前正在处理for循环
-            changeProcessing(PROCESSING_STATE.FOR); 
+            changeProcessing(PROCESSING_STATE.FOR);
             const renderItem = defaultProcess(node);
             // 结束for循环状态
             resetProcessing();
@@ -114,8 +115,8 @@ function processNodeChildren(nodes = []) {
 
 /**
  * 默认的处理函数
- * @param {HTMLElement} node 
- * @returns 
+ * @param {HTMLElement} node
+ * @returns
  */
 function defaultProcess(node) {
     // 删除注释节点
@@ -155,34 +156,34 @@ function defaultProcess(node) {
 function generateCreateDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_DOM); // 设置要引入的包
     if (!children) {
-        return `{ type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
+        return `{ type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
     }
-    return `{ type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children}); }}`;
+    return `{ type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children}); }}`;
 }
 
 /**
  * 生成创建副作用dom元素的语句
- * @param {string} tagName 
- * @param {string} attrs 
- * @param {string} children 
- * @returns 
+ * @param {string} tagName
+ * @param {string} attrs
+ * @param {string} children
+ * @returns
  */
 function generateCreateEffectDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_EFFECT_DOM); // 设置要引入的包
     if (getProcessing() === PROCESSING_STATE.FOR) {
-        return `{type: 'defaultDom', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
+        return `{type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
     }
-    return `{ type: 'reactiveDom', renderFn: () => { return ${PackageName.CREATE_EFFECT_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
+    return `{ type: ${DOM_TYPE.REACTIVE_DOM}, renderFn: () => { return ${PackageName.CREATE_EFFECT_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
 }
 
 /**
  * 生成for循环语句
- * @param {{listName: string, variableName: string}} forObject 
- * @param {string} children 
- * @returns 
+ * @param {{listName: string, variableName: string}} forObject
+ * @param {string} children
+ * @returns { string } for statement
  */
 function generateForDomStatement(forObject, children) {
     setImportPackageSet(PackageName.RENDER_LIST); // 设置要引入的包
-    return `{ type: 'for', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
+    return `{ type: ${DOM_TYPE.FOR}, renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
 }
 

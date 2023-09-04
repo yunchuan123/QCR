@@ -3,9 +3,11 @@ import templateParser from "../dom/index.js";
 import { parseScript, extractImportStatement, removeImport } from "../script/index.js";
 import { generateClassNameByFileName } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
+import { trimString } from "../../utils/string-utils.js";
+
 import PackageName from "../constant/package-name.js";
 import Log from "../../utils/log.js";
-import { trimString } from "../../utils/string-utils.js";
+
 
 const styleRegex = /<style.*?>([\s\S]*?)<\/style>/i;
 const scriptRegex = /<script.*?>([\s\S]*?)<\/script>/i;
@@ -18,6 +20,7 @@ const PART_TYPE = {
     IMPORT: "_import"
 }
 
+// 当前正在处理的文件名
 let filename = "";
 
 /**
@@ -31,8 +34,28 @@ function generateImportPackagesStatement() {
 }
 
 /**
+ * HTML class generator
+ * @param className
+ * @param code
+ * @returns {Promise<string>}
+ */
+async function classCodeGenerator(className, code) {
+    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {\n setup() {\n${code[PART_TYPE.SCRIPT]}\n}\n render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} \n ${await code[PART_TYPE.STYLE]}\n}; \n`;
+}
+
+/**
+ * 生成customElement定义语句
+ * @param filename
+ * @param className
+ * @returns {string}
+ */
+function generateDefineStatement(filename, className) {
+    return `window.customElements.define('${filename}', ${className})`
+}
+
+/**
  * 生成代码包装
- * @param content
+ * @param code
  * @returns {string}
  */
 async function generateExportStatement(code) {
@@ -41,8 +64,8 @@ async function generateExportStatement(code) {
     importStatement += code[PART_TYPE.IMPORT];
     // 根据文件名创建类名-定义自定义元素
     const className = generateClassNameByFileName(filename);
-    const defineStatement = `window.customElements.define('${filename}', ${className})`;
-    const content = `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {\n setup() {\n${code[PART_TYPE.SCRIPT]}\n}\n render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} \n ${await code[PART_TYPE.STYLE]}\n}; \n`;
+    const defineStatement = generateDefineStatement(filename, className);
+    const content = await classCodeGenerator(className, code);
     return importStatement + content + defineStatement;
 }
 
@@ -74,14 +97,6 @@ export function parse(code, _filename) {
     return baseParser(generateNode(parts));
 }
 
-
-/**
- * 解析sfc后解析出的script、template、style
- * @typedef {Object} SfcNode
- * @property {Part[]} parts
- */
-
-
 /**
  * SfcNode
  * @param node 三个节点
@@ -95,19 +110,19 @@ function baseParser(node) {
         switch (PART_TYPE[key]) {
             case PART_TYPE.SCRIPT:
                 Log.info(`开始编译 ------ ${filename} ------ javascript`)
-                result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code));
-                const code = removeImport(part.code);
-                result[PART_TYPE.SCRIPT] = parseScript(code);
+                result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code)); // 先处理script标签中的import语句
+                const code = removeImport(part.code); // 删除script标签中的import语句
+                result[PART_TYPE.SCRIPT] = parseScript(code); // 开始解析script
                 Log.success('编译完成 ------ javascript ------ success')
                 break;
             case PART_TYPE.STYLE:
                 Log.info(`开始编译 ------ ${filename} ------ style`)
-                result[PART_TYPE.STYLE] = lessParser(part.code);
+                result[PART_TYPE.STYLE] = lessParser(part.code); // 解析less语法
                 Log.success('编译完成 ------ style ------ success')
                 break;
             case PART_TYPE.TEMPLATE:
                 Log.info(`开始编译 ------ ${filename} ------ template`)
-                result[PART_TYPE.TEMPLATE] = templateParser(`<template>${part.code}</template>`);
+                result[PART_TYPE.TEMPLATE] = templateParser(`<template>${part.code}</template>`); // 开始解析template
                 Log.success('开始编译 ------ template ------ success')
                 break;
         }
@@ -124,6 +139,11 @@ function constitute(result) {
     return generateExportStatement(result);
 }
 
+/**
+ * 生成node
+ * @param parts
+ * @returns {{}}
+ */
 function generateNode(parts = {}) {
     const node = {};
     node.parts = parts;

@@ -1,4 +1,4 @@
-import { carError } from "../../../utils/error-utils.js";
+import Log from "../../../../utils/log.js";
 import { effect } from "@vue/reactivity";
 
 /**
@@ -11,7 +11,7 @@ import { effect } from "@vue/reactivity";
  */
 export function renderList(arr, renderChildFn, el, arrStr) {
     if (!arr) {
-        carError(`Cannot read properties of undefined (reading '${arrStr.replace("ctx.")}')`);
+        Log.error(`Cannot read properties of undefined (reading '${arrStr.replace("ctx.")}')`);
     }
     let cache = [];
     effect(() => {

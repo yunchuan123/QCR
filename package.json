@@ -26,6 +26,7 @@
     "rollup-pluginutils": "^2.8.2"
   },
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@vue/reactivity": "^3.3.4",
     "lodash": "^4.17.21"
   }

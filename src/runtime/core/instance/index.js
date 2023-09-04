@@ -23,5 +23,5 @@ export function useInstance() {
     if (!instance) {
         log.error("请不要在组件以外的地方使用useInstance")
     }
-    return getInstance();
+    return instance;
 }

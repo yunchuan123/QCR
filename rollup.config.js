@@ -1,3 +1,4 @@
+import resolve from "@rollup/plugin-node-resolve"
 
 export default [
     {
@@ -12,6 +13,9 @@ export default [
         output: {
             file: "dist/runtime.js",
             format: "esm"
-        }
+        },
+        plugins: [
+            resolve()
+        ]
     }
 ]

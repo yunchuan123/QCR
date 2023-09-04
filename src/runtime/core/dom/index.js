@@ -2,14 +2,7 @@ import TagName from "./constant/tag-name.js";
 import {effect} from "@vue/reactivity";
 import { createEffectAttribute } from "./attribute/effect-attribute.js";
 import register from "./attribute/custom/index.js";
-import { createEventAttribute } from "./attribute/event.js";
-
-/**
- * 解析sfc后解析出的script、template、style
- * @typedef {Object} SfcNode
- * @property {Part[]} parts
- */
-
+import { processEventAttribute } from "./attribute/event.js";
 
 const compilerAttribute = {};
 
@@ -26,33 +19,17 @@ register(); // 注册所有处理器
  * @param {[HTMLElement]}children
  */
 export function createDom(tagName, attr, children) {
-    if (tagName === TagName.TEXT) { return document.createTextNode(children) };
+    if (tagName === TagName.TEXT) {
+        return document.createTextNode(children)
+    }
     const el = document.createElement(tagName);
-    /**
-     * 开始处理attribute
-     */
-    Object.keys(attr).forEach(key => {
-        const value = attr[key];
-        const params = { el, value }
-        if (isEvent(key)) { // 处理事件绑定
-            createEventAttribute(el, key, value);
-        } else if (compilerAttribute[key]) { // 处理自定义的attribute
-            const compiler = compilerAttribute[key];
-            compiler.handler(params);
-            return;
-        } else if (typeof value === "function" && key.startsWith(":")) { // 处理响应式属性
-            // 创建响应式attribute（如果属性以:开头证明为响应式属性）
-            createEffectAttribute(el, key, value);
-        } else { // 处理普通类型的 attribute
-            el.setAttribute(key, value);
-        }
-    });
+    processAttribute(el, attr);
     // 开始清理children
     if (Array.isArray(children)) {
         children.forEach((element) => {
             if (!element) {
                 return;
-            } 
+            }
             switch (element.type) {
                 case "defaultDom":
                     el.appendChild(element.renderFn());
@@ -69,6 +46,30 @@ export function createDom(tagName, attr, children) {
     return el;
 }
 
+function processAttribute(el, attr) {
+    const keys = Object.keys(attr);
+    if (Array.isArray(keys) && keys.length > 0) {
+        keys.forEach(key => {
+            const value = attr[key];
+            const params = { el, value };
+            if (isEvent(key)) {
+                // 处理事件绑定
+                processEventAttribute(el, key, value);
+            } else if (compilerAttribute[key]) {
+                const compiler = compilerAttribute[key];
+                compiler.handler(params);
+            } else if (typeof value === "function" && key.startsWith(":")) {
+                // 处理响应式属性
+                // 创建响应式attribute（如果属性以:开头证明为响应式属性）
+                createEffectAttribute(el, key, value);
+            } else {
+                // 处理普通类型的 attribute
+                el.setAttribute(key, value);
+            }
+        });
+    }
+}
+
 /**
  * 生成副作用响应式变量
  * @param {string} tagName
@@ -83,8 +84,8 @@ export function createEffectDom(tagName, attr, children ) {
 
 /**
  * 判断是否为事件
- * @param {string} name 
- * @returns 
+ * @param {string} name
+ * @returns
  */
 function isEvent(name) {
     return name.startsWith("@");

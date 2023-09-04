@@ -4,8 +4,8 @@ import { isFunction } from "../../../../utils/general.js";
 export const vifAttributeHandler = {
     name: "v-if",
     /**
-     * 
-     * @param {{el: HTMLElement, value: string | function}} param0 
+     * v-if 的处理器
+     * @param {{el: HTMLElement, value: string | function}} param0
      */
     handler({el, value}) {
         let _parentElement;
@@ -15,6 +15,7 @@ export const vifAttributeHandler = {
         _temp_div.style.display = "none";
 
         effect(() => {
+            // 异步保证父元素已经加载
             Promise.resolve(value()).then((res) => {
                 _parentElement = _parentElement || _el.parentElement;
 
@@ -30,5 +31,5 @@ export const vifAttributeHandler = {
                 }
             })
         })
-    }   
+    }
 }
