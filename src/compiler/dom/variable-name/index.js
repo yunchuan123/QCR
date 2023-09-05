@@ -2,6 +2,7 @@ import babel from "@babel/core";
 import { transformIdentifier } from "./babel-plugins/transformIdentifier.js";
 import log from "../../../utils/log.js";
 import { trimString } from "../../../utils/string-utils.js";
+import { setNewVarName } from "../../utils/export-variable-utils.js";
 
 /**
  * 缓存变量名
@@ -48,7 +49,10 @@ export function cacheVariableNameHas(varName) {
  */
 export function setPrefix(prop, _prefix) {
     const prefix = _prefix || defaultPrefix;
-    if (!variableInCache(prop)) {
+    const currentPrefix = getPrefix(prop);
+    if (!variableInCache(currentPrefix)) {
+        // 将变量名设置为可导出状态
+        setNewVarName(currentPrefix);
         return `${prefix}.${prop}`;
     } else {
         return prop;
@@ -56,14 +60,22 @@ export function setPrefix(prop, _prefix) {
 }
 
 /**
- * 变量是否在缓存中（包含拆分prop的功能，例如obj.name 会将obj拆分出来）
+ * 获取当前变量前缀
  * @param {string} prop
+ * @returns {*|string}
+ */
+function getPrefix(prop) {
+    if (!prop) return "";
+    return prop.split(".")[0];
+}
+
+/**
+ * 变量是否在缓存中（包含拆分prop的功能，例如obj.name 会将obj拆分出来）
+ * @param {string} currentPrefix
  * @returns {boolean|string}
  */
-export function variableInCache(prop) {
-    if (!prop) return "";
-    const propParts = prop.split(".");
-    return cacheVariableNameHas(propParts[0]);
+export function variableInCache(currentPrefix) {
+    return cacheVariableNameHas(currentPrefix);
 }
 
 /**

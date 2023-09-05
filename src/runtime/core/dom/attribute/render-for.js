@@ -6,12 +6,12 @@ import { effect } from "@vue/reactivity";
  * @param {[]} arr
  * @param {() => HTMLElement} renderChildFn
  * @param {HTMLElement} el
- * @param {string} arrStr
+ * @param {string} fieldName
  * @returns {*}
  */
-export function renderList(arr, renderChildFn, el, arrStr) {
+export function renderList(arr, renderChildFn, el, fieldName) {
     if (!arr) {
-        Log.error(`Cannot read properties of undefined (reading '${arrStr.replace("ctx.")}')`);
+        Log.error(`Cannot read properties of undefined (reading '${fieldName.replace("ctx.")}')`);
     }
     let cache = [];
     effect(() => {

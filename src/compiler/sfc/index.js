@@ -40,7 +40,7 @@ function generateImportPackagesStatement() {
  * @returns {Promise<string>}
  */
 async function classCodeGenerator(className, code) {
-    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {\n setup() {\n${code[PART_TYPE.SCRIPT]}\n}\n render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} \n ${await code[PART_TYPE.STYLE]}\n}; \n`;
+    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {setup() {${code[PART_TYPE.SCRIPT]}} render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} ${await code[PART_TYPE.STYLE]}};`;
 }
 
 /**

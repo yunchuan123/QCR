@@ -6,26 +6,26 @@ import { CustomAttribute } from "../../../../../constant/attribute-name";
  * 用于计算类型
  */
 const types = [
-    { name: "array", fn: isArray },
-    { name: "string", fn: isString },
-    { name: "object", fn: isObject }
+    { name: "array", check: isArray },
+    { name: "string", check: isString },
+    { name: "object", check: isObject }
 ]
 
 /**
  * 计算类型
- * @param {string} _value 
- * @returns 
+ * @param {string} _value
+ * @returns
  */
 function calcType(_value) {
     for (let item of types) {
-        if (item.fn(_value)) {
+        if (item.check(_value)) {
             return item.name;
         }
     }
 }
 
 /**
- * handler
+ * 处理class的策略模式
  */
 const handler = {
     "array": (_value, classList) => {

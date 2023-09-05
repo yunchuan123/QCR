@@ -156,9 +156,9 @@ function defaultProcess(node) {
 function generateCreateDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_DOM); // 设置要引入的包
     if (!children) {
-        return `{ type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
+        return `{ type: '${DOM_TYPE.DEFAULT_DOM}', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}); }}`
     }
-    return `{ type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children}); }}`;
+    return `{ type: '${DOM_TYPE.DEFAULT_DOM}', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children}); }}`;
 }
 
 /**
@@ -171,9 +171,9 @@ function generateCreateDomStatement(tagName, attrs, children) {
 function generateCreateEffectDomStatement(tagName, attrs, children) {
     setImportPackageSet(PackageName.CREATE_EFFECT_DOM); // 设置要引入的包
     if (getProcessing() === PROCESSING_STATE.FOR) {
-        return `{type: ${DOM_TYPE.DEFAULT_DOM}, renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
+        return `{type: '${DOM_TYPE.DEFAULT_DOM}', renderFn: () => { return ${PackageName.CREATE_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
     }
-    return `{ type: ${DOM_TYPE.REACTIVE_DOM}, renderFn: () => { return ${PackageName.CREATE_EFFECT_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
+    return `{ type: '${DOM_TYPE.REACTIVE_DOM}', renderFn: () => { return ${PackageName.CREATE_EFFECT_DOM}('${tagName}', ${compilerAttribute(attrs)}, ${children})}}`
 }
 
 /**
@@ -184,6 +184,6 @@ function generateCreateEffectDomStatement(tagName, attrs, children) {
  */
 function generateForDomStatement(forObject, children) {
     setImportPackageSet(PackageName.RENDER_LIST); // 设置要引入的包
-    return `{ type: ${DOM_TYPE.FOR}, renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
+    return `{ type: '${DOM_TYPE.FOR}', renderFn: (el) => { return ${PackageName.RENDER_LIST}(${setPrefix(forObject.listName)}, (${forObject.variableName}) => { return ${children}}, el, '${forObject.listName}')}} `;
 }
 

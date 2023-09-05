@@ -10,41 +10,8 @@ export function registerCompilerAttribute(attributeHandler) {
     compilerAttribute[attributeHandler.name] = attributeHandler;
 }
 
-register(); // 注册所有处理器
+register(); // 注册所有attribute处理器
 
-/**
- *
- * @param {string} tagName
- * @param {{[key:string], [value: string]}} attr
- * @param {[HTMLElement]}children
- */
-export function createDom(tagName, attr, children) {
-    if (tagName === TagName.TEXT) {
-        return document.createTextNode(children)
-    }
-    const el = document.createElement(tagName);
-    processAttribute(el, attr);
-    // 开始清理children
-    if (Array.isArray(children)) {
-        children.forEach((element) => {
-            if (!element) {
-                return;
-            }
-            switch (element.type) {
-                case "defaultDom":
-                    el.appendChild(element.renderFn());
-                    break;
-                case "reactiveDom":
-                    el.appendChild(element.renderFn());
-                    break;
-                case "for":
-                    element.renderFn(el);
-                    break;
-            }
-        });
-    }
-    return el;
-}
 
 function processAttribute(el, attr) {
     const keys = Object.keys(attr);
@@ -68,6 +35,38 @@ function processAttribute(el, attr) {
             }
         });
     }
+}
+
+/**
+ *
+ * @param {string} tagName
+ * @param {{[key:string], [value: string]}} attr
+ * @param {[HTMLElement]}children
+ */
+export function createDom(tagName, attr, children) {
+    if (tagName === TagName.TEXT) {
+        return document.createTextNode(children)
+    }
+    const el = document.createElement(tagName);
+    processAttribute(el, attr);
+    // 开始清理children
+    if (Array.isArray(children)) {
+        children.forEach((element) => {
+            if (!element) {
+                return;
+            }
+            switch (element.type) {
+                case "defaultDom":
+                case "reactiveDom":
+                    el.appendChild(element.renderFn());
+                    break;
+                case "for":
+                    element.renderFn(el);
+                    break;
+            }
+        });
+    }
+    return el;
 }
 
 /**

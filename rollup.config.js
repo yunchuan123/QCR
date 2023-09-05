@@ -6,7 +6,10 @@ export default [
         output: {
             file: "dist/compiler.js",
             format: "esm"
-        }
+        },
+        plugins: [
+            // resolve()
+        ]
     },
     {
         input: "src/runtime/index.js",

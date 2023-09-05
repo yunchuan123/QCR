@@ -1,6 +1,6 @@
 import { setPrefix } from "../variable-name/index.js";
 import { CustomAttributeArr } from "../../../constant/attribute-name.js";
-import {getProcessing, PROCESSING_STATE} from "../processing/index.js";
+import {getProcessing, PROCESSING_STATE } from "../processing/index.js";
 import ObjectUtils from "../../../utils/object-utils.js";
 import register from "./custom/index.js";
 import { processEventHandler } from "./custom/event.js";
@@ -87,8 +87,8 @@ function isCustom(attr) {
 
 /**
  * 是否为事件监听
- * @param {{name: stirng, value: string}} attr 
- * @returns 
+ * @param {{name: stirng, value: string}} attr
+ * @returns
  */
 function isEvent(attr) {
     return attr.name.startsWith("@");
@@ -105,8 +105,8 @@ function isReactiveAttribute(attr) {
 
 /**
  * 生成副作用语句
- * @param {{[key:string]:[value:string]}} attr 
- * @returns 
+ * @param {{[key:string]:[value:string]}} attr
+ * @returns
  */
 function generateEffectStatement(attr) {
     return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}}`

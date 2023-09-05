@@ -4,24 +4,25 @@ import "../dom/index.js";
 import babel from "@babel/core";
 import { trimString } from "../../utils/string-utils.js";
 import log from "../../utils/log.js";
+import { hasVarName } from "../utils/export-variable-utils.js";
 
 /**
  * 推送变量名到数组中
- * @param {string[]} arr 
- * @param {string} varName 
+ * @param {string[]} arr
+ * @param {string} varName
  */
 function pushVarNamrToArr(arr, varName) {
     if (arr.includes(varName)) {
-        log.error("请勿在文件中定义重复的变量名")
-    } else {
+        log.error("请勿在文件中定义重复的变量名");
+    } else if (hasVarName(varName)){ // 确认变量是需要导出的变量， tree-shaking优化
         arr.push(varName);
     }
 }
 
 /**
  * 解析出顶层的所有变量并导出
- * @param {string} code 
- * @returns 
+ * @param {string} code
+ * @returns
  */
 export function parseScriptVariables(code) {
     const ast = parse(code, { sourceType: "module" });
@@ -36,7 +37,7 @@ export function parseScriptVariables(code) {
                         pushVarNamrToArr(variables, declaration.id.name)
                     }
                 });
-            // 导出function声明的变量 
+            // 导出function声明的变量
             } else if (path.isFunctionDeclaration()) {
                 pushVarNamrToArr(variables, path.node.id.name)
             }
@@ -48,8 +49,8 @@ export function parseScriptVariables(code) {
 
 /**
  * 处理script标签中的import语句
- * @param {string} code 
- * @returns 
+ * @param {string} code
+ * @returns
  */
 export function extractImportStatement(code) {
     const ast = parse(code, { sourceType: "module"});
@@ -81,8 +82,8 @@ export function parseScript(code) {
 }
 /**
  * 移除原code中的import
- * @param {string} originalCode 
- * @returns 
+ * @param {string} originalCode
+ * @returns
  */
 export function removeImport(originalCode) {
     const { code: transformedCode } = babel.transformSync(originalCode, {

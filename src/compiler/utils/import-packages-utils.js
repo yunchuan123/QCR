@@ -25,7 +25,7 @@ export function clearPackage() {
 export function generatePackagesStatement() {
     const packages = getImportPackageSet();
     let packageStr = Array.from(packages).toString();
-    return `import {${packageStr}} from 'car'\n`;
+    return `import {${packageStr}} from 'car';`;
 }
 
 /**
@@ -39,10 +39,10 @@ export function importArrToString(imports) {
         if (item.importedVariables.length === 1 && item.importedVariables[0].type === "ImportDefaultSpecifier") {
             const name = item.importedVariables[0].name;
             const source = item.source;
-            importStatement += `import ${name} from '${source}';\n`;
+            importStatement += `import ${name} from '${source}';`;
         } else {
             const importedVariables = item.importedVariables.map(item => item.name).toString();
-            importStatement += `import {${importedVariables}} from '${item.source}';\n`;
+            importStatement += `import {${importedVariables}} from '${item.source}';`;
         }
     })
     return importStatement;

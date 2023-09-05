@@ -8,6 +8,6 @@ export const classAttributeHandler = {
     name: CustomAttribute.CLASS,
     handler(attrVo) {
         const {attr} = attrVo;
-        return `'${CustomAttribute.CLASS}' : () => { return ${replaceVariablesUsingStateMachine(attr.value)}}`
+        return `'${CustomAttribute.CLASS}' : () => { return ${replaceVariablesUsingStateMachine(attr.value)} }`
     }
 }
