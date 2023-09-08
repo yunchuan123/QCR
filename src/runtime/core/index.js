@@ -1,52 +1,45 @@
 import { onMountedRun, collectionMountedFn } from "./lifrcycle/mounted.js";
 import { setInstance, clearInstance } from "./instance/index.js";
 import { setCollection, popColletion, setCurrentRefMap } from "./dom/attribute/custom/ref.js";
+import { reactive } from "@vue/reactivity";
+import { getProps } from "./props/index.js";
+
+import "./emit/index.js";
 
 export function _carRender(tree) {
     return tree.renderFn();
 }
 
-const defaultEventOptions = {
-    bubbles: true,  // 事件会冒泡
-    composed: true, // 事件可以穿越shadow DOM边界
-    detail: { data: undefined }
-}
-
-/**
- *  增加事件emit方法
- * @param {string} name
- * @param {any} value
- * @param {object} options
- */
-HTMLElement.prototype.$emit = function(name, value, options = {}) {
-    const _options = Object.assign(defaultEventOptions, options);
-    _options.detail.data = value;
-    const event = new CustomEvent(name.toLowerCase(), _options);
-    this.dispatchEvent(event);
-};
-
-/**
- * 增加listen方法
- * @param eventName
- * @param fn
- */
-HTMLElement.prototype.$listen = function(eventName, fn) {
-    this.addEventListener(eventName, (e) => fn(e.detail.data))
-}
-
-
 export class CustomElement extends HTMLElement {
     constructor() {
         super();
+
         // 创建refs收集器 todo：待优化
         const refMap = new Map();
         setCollection(refMap);
+
 
         /**
          * setup - setup期间会收集声明周期函数，然后在相应的时间回调
          * 这段代码也说明了, useInstance 只能在setup中使用
          */
-        const context = this.callSetup();
+        this.callSetup();
+        
+        /**
+         * 开始处理props（创建响应式的props）
+         */
+
+        let props = {};
+        const propArr = getProps();
+        propArr.forEach(key => {
+            props[key] = undefined;
+        })
+        let _props = reactive(props);
+        this._attributeChangedCallback = (name, oldValue, newValue) => {
+            if (propArr.includes(name)) {
+                _props[name] = newValue;
+            }
+        }
 
         // 结束收集mounted回调
         const mountedFns = collectionMountedFn();
@@ -55,7 +48,7 @@ export class CustomElement extends HTMLElement {
         let element;
         // render函数是编译模板自动生成的
         if (this.render) {
-            element = _carRender(this.render(context));
+            element = _carRender(this.render(context, _props));
             // 增加$forceRender api
             this.$forceRender = () => {
                const forceRenderElement = _carRender(this.render(context));

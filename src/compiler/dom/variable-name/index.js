@@ -50,7 +50,10 @@ export function cacheVariableNameHas(varName) {
 export function setPrefix(prop, _prefix) {
     const prefix = _prefix || defaultPrefix;
     const currentPrefix = getPrefix(prop);
-    if (!variableInCache(currentPrefix)) {
+    // 如果是props.xx直接返回
+    if (currentPrefix === "props") {
+        return prop;
+    } else if (!variableInCache(currentPrefix)) {
         // 将变量名设置为可导出状态
         setNewVarName(currentPrefix);
         return `${prefix}.${prop}`;
@@ -79,7 +82,7 @@ export function variableInCache(currentPrefix) {
 }
 
 /**
- * 为语句中需要加前缀的变量加上前缀
+ * 为code中需要加前缀的变量加上前缀
  * @param {string} expression
  * @returns
  */

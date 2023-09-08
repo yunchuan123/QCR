@@ -65,6 +65,43 @@ export function extractImportStatement(code) {
     return imports;
 }
 
+/**
+ * 定义响应式的props
+ * @param {string} code 
+ * @returns string[]
+ */
+
+export function defineProps(code) {
+    const ast = parse(code, { sourceType: "module" });
+    const props = [];
+    traverse.default(ast, {
+        enter(path) {
+            // 导出const、let、var声明的变量
+            if (path.isExpressionStatement()) {
+                if (path.node.expression.callee.name === "defineProps") {
+                    const _arguments = path.node.expression.arguments;
+                    if (_arguments[0].type === "ArrayExpression") {
+                        _arguments[0].elements.forEach(item => {
+                            if (item.type === "StringLiteral") {
+                                if (props.includes(item.value)) {
+                                    log.error("请勿定义重复的props");
+                                }
+                                props.push(`'${item.value}'`);
+                            } else {
+                                log.error("defineProps定义的数组中只能定义字符串")
+                            }
+                        })
+                    } else {
+                        log.error("defineProps中只能定义数组")
+                    }
+                }
+            }
+        }
+    });
+
+    return `[${props.join(",")}]`;
+}
+
 
 /**
  *  解析script，并return所有顶层变量

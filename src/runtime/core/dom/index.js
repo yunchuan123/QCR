@@ -19,7 +19,7 @@ function processAttribute(el, attr) {
         keys.forEach(key => {
             const value = attr[key];
             const params = { el, value };
-            if (isEvent(key)) {
+           if (isEvent(key)) {
                 // 处理事件绑定
                 processEventAttribute(el, key, value);
             } else if (compilerAttribute[key]) {
