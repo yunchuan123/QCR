@@ -31,7 +31,7 @@ function processAttribute(el, attr) {
                 if (key.startsWith(":")) {
                     // 处理响应式属性
                     // 创建响应式attribute（如果属性以:开头证明为响应式属性）
-                    createReactiveAttribute(el, key, value);
+                    createReactiveAttribute(el, key.replace(":", ""), value);
                 } else {
                     el.setAttribute(key, value());
                 }

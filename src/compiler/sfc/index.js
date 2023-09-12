@@ -1,6 +1,6 @@
 import lessParser from "../style/index.js";
 import templateParser from "../dom/index.js";
-import { parseScript, extractImportStatement, removeImport, defineProps } from "../script/index.js";
+import { parseScript, extractImportStatement, removeImport } from "../script/index.js";
 import { generateClassNameByFileName } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
 import { trimString } from "../../utils/string-utils.js";
@@ -114,7 +114,6 @@ function baseParser(node) {
                 result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code)); // 先处理script标签中的import语句
                 const code = removeImport(part.code); // 删除script标签中的import语句
                 result[PART_TYPE.SCRIPT] = parseScript(code); // 开始解析script
-                // result[PART_TYPE.PROPS] = defineProps(code);
                 Log.success('编译完成 ------ javascript ------ success')
                 break;
             case PART_TYPE.STYLE:
