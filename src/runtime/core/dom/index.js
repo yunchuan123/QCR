@@ -1,8 +1,8 @@
 import TagName from "./constant/tag-name.js";
 import {effect} from "@vue/reactivity";
-import { createEffectAttribute } from "./attribute/effect-attribute.js";
+import { createReactiveAttribute } from "./attribute/reactive-attribute.js";
 import register from "./attribute/custom/index.js";
-import { processEventAttribute } from "./attribute/event.js";
+import { processEvent, processNativeEvent } from "./attribute/event.js";
 
 const compilerAttribute = {};
 
@@ -19,9 +19,11 @@ function processAttribute(el, attr) {
         keys.forEach(key => {
             const value = attr[key];
             const params = { el, value };
-           if (isEvent(key)) {
+           if (isCarEvent(key)) {
                 // 处理事件绑定
-                processEventAttribute(el, key, value);
+                processEvent(el, key, value);
+            } else if (isNativeEvent(key)) {
+                processNativeEvent(el, key, value);
             } else if (compilerAttribute[key]) {
                 const compiler = compilerAttribute[key];
                 compiler.handler(params);
@@ -29,7 +31,7 @@ function processAttribute(el, attr) {
                 if (key.startsWith(":")) {
                     // 处理响应式属性
                     // 创建响应式attribute（如果属性以:开头证明为响应式属性）
-                    createEffectAttribute(el, key, value);
+                    createReactiveAttribute(el, key, value);
                 } else {
                     el.setAttribute(key, value());
                 }
@@ -90,8 +92,12 @@ export function createEffectDom(tagName, attr, children ) {
  * @param {string} name
  * @returns
  */
-function isEvent(name) {
+function isCarEvent(name) {
     return name.startsWith("@");
+}
+
+function isNativeEvent(name) {
+    return name.startsWith("on")
 }
 
 
