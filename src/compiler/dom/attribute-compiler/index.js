@@ -109,7 +109,7 @@ function isReactiveAttribute(attr) {
  * @returns
  */
 function generateEffectStatement(attr) {
-    return `${attr.name.replace(":", "")}: () => { return ${setPrefix(attr.value)}}`
+    return `${attr.name}: () => { return ${setPrefix(attr.value)}}`
 }
 
 
