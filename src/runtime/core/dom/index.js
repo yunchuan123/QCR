@@ -25,10 +25,14 @@ function processAttribute(el, attr) {
             } else if (compilerAttribute[key]) {
                 const compiler = compilerAttribute[key];
                 compiler.handler(params);
-            } else if (typeof value === "function" && key.startsWith(":")) {
-                // 处理响应式属性
-                // 创建响应式attribute（如果属性以:开头证明为响应式属性）
-                createEffectAttribute(el, key, value);
+            } else if (typeof value === "function") {
+                if (key.startsWith(":")) {
+                    // 处理响应式属性
+                    // 创建响应式attribute（如果属性以:开头证明为响应式属性）
+                    createEffectAttribute(el, key, value);
+                } else {
+                    el.setAttribute(key, value());
+                }
             } else {
                 // 处理普通类型的 attribute
                 el.setAttribute(key, value);
