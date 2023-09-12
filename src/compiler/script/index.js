@@ -103,5 +103,3 @@ export function removeImport(originalCode) {
     });
     return transformedCode;
 }
-
-export { defineProps } from "./props/index.js";
