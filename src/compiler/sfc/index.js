@@ -41,7 +41,7 @@ function generateImportPackagesStatement() {
  * @returns {Promise<string>}
  */
 async function classCodeGenerator(className, code) {
-    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} { static get observedAttributes() { return ${code[PART_TYPE.PROPS]} }; attributeChangedCallback(n,o,l) { this._attributeChangedCallback(n,o,l)}; setup() {${code[PART_TYPE.SCRIPT]}} render(ctx, props) { return ${code[PART_TYPE.TEMPLATE]};} ${await code[PART_TYPE.STYLE]}};`;
+    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} { setup() {${code[PART_TYPE.SCRIPT]}} render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} ${await code[PART_TYPE.STYLE]}};`;
 }
 
 /**
@@ -114,7 +114,7 @@ function baseParser(node) {
                 result[PART_TYPE.IMPORT] = importArrToString(extractImportStatement(part.code)); // 先处理script标签中的import语句
                 const code = removeImport(part.code); // 删除script标签中的import语句
                 result[PART_TYPE.SCRIPT] = parseScript(code); // 开始解析script
-                result[PART_TYPE.PROPS] = defineProps(code);
+                // result[PART_TYPE.PROPS] = defineProps(code);
                 Log.success('编译完成 ------ javascript ------ success')
                 break;
             case PART_TYPE.STYLE:

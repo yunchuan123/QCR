@@ -51,9 +51,7 @@ export function setPrefix(prop, _prefix) {
     const prefix = _prefix || defaultPrefix;
     const currentPrefix = getPrefix(prop);
     // 如果是props.xx直接返回
-    if (currentPrefix === "props") {
-        return prop;
-    } else if (!variableInCache(currentPrefix)) {
+   if (!variableInCache(currentPrefix)) {
         // 将变量名设置为可导出状态
         setNewVarName(currentPrefix);
         return `${prefix}.${prop}`;

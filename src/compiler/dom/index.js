@@ -40,6 +40,9 @@ function clearCode(code) {
  */
 function traverse(node) {
     if (node.nodeName === "template") {
+        if (node.content.childNodes.length > 1) {
+            log.error("组件只能有一个根元素")
+        }
         return node.content.childNodes[0];
     }
     if (node.childNodes) {
