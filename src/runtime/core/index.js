@@ -41,12 +41,12 @@ export class CustomElement extends HTMLElement {
                shadowRoot.appendChild(forceRenderElement);
             }
         }
-        // style 函数也是编译模板自动生成的
-        this.style && shadowRoot.appendChild(this.style());
         if (element) {
             shadowRoot.appendChild(element);
         }
-
+        // style 函数也是编译模板自动生成的
+        this.style && shadowRoot.appendChild(this.style());
+        
         // 设置当前refs todo：待优化
         setCurrentRefMap(refMap);
 

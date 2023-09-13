@@ -12,7 +12,6 @@ export function registerCompilerAttribute(attributeHandler) {
 
 register(); // 注册所有attribute处理器
 
-
 function processAttribute(el, attr) {
     const keys = Object.keys(attr);
     if (Array.isArray(keys) && keys.length > 0) {
@@ -44,7 +43,7 @@ function processAttribute(el, attr) {
 }
 
 /**
- *
+ * 创建dom元素
  * @param {string} tagName
  * @param {{[key:string], [value: string]}} attr
  * @param {[HTMLElement]}children
@@ -54,7 +53,9 @@ export function createDom(tagName, attr, children) {
         return document.createTextNode(children)
     }
     const el = document.createElement(tagName);
+
     processAttribute(el, attr);
+
     // 开始清理children
     if (Array.isArray(children)) {
         children.forEach((element) => {

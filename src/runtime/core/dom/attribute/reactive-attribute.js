@@ -1,5 +1,6 @@
 import { effect } from "@vue/reactivity";
 import { updateProp } from "../../props/index.js";
+import { isCustomELement } from "../../../utils/attribute-utils.js";
 
 /**
  * 
@@ -8,7 +9,7 @@ import { updateProp } from "../../props/index.js";
  * @param {function} fn
  */
 export function createReactiveAttribute(el, name, fn) {
-    if (el.localName.includes("-")) {
+    if (isCustomELement(el)) {
         /**
          * 该段逻辑处理的是props 
          */
