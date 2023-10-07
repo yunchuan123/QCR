@@ -9,25 +9,14 @@ import { setPrefix } from "./variable-name/index.js";
 import { trimString } from "../../utils/string-utils.js";
 import log from "../../utils/log.js";
 import { DOM_TYPE } from "../constant/dom-type.js";
-
-/**
- * 判断字符串是不是空字符（空格也算）
- * @param {string} str
- * @returns
- */
-function isStringAllWhitespace(str) {
-    if(!str) {
-        return true;
-    }
-    return /^\s*$/.test(str);
-}
+import { isStringAllWhitespace } from "../../utils/string-utils.js";
 
 /**
  *  清理html
  * @param {string} code
  * @returns {*}
  */
-function clearCode(code) {
+export function clearCode(code) {
     return trimString(code)
         .replace(/[\n\r\t]/g, "")
         .replace(/>[\s]+</g, "><");

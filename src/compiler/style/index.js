@@ -1,8 +1,11 @@
 import less from "less";
 import { minify } from "csso";
+import { setCacheMap } from "./cache/index.js";
+import { getCurrentFileName } from "../sfc/index.js";
+import { isStringAllWhitespace } from "../../utils/string-utils.js";
 
 function generateStyleElement(css) {
-    return `style() {const style = document.createElement('style');style.textContent = "${css}";return style;}`;
+    return `() => {const style = document.createElement('style');style.textContent = "${css}";return style;}`;
 }
 
 /**
@@ -12,5 +15,7 @@ function generateStyleElement(css) {
 export default async function (code) {
     const result = await less.render(code, { filename: "less", sourceMap: false});
     const css = minify(result.css).css;
-    return generateStyleElement(css);
+    if (!isStringAllWhitespace(css)) {
+        setCacheMap(getCurrentFileName(), generateStyleElement(css));
+    }
 }

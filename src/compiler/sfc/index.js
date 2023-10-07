@@ -4,12 +4,11 @@ import { parseScript, extractImportStatement, removeImport } from "../script/ind
 import { generateClassNameByFileName } from "../utils/filename-utils.js";
 import { generatePackagesStatement, setImportPackageSet, importArrToString } from "../utils/import-packages-utils.js";
 import { trimString } from "../../utils/string-utils.js";
-
 import PackageName from "../constant/package-name.js";
 import Log from "../../utils/log.js";
 
 
-const styleRegex = /<style.*?>([\s\S]*?)<\/style>/i;
+export const styleRegex = /<style\s+lang=['"]?less['"]?>([\s\S]*?)<\/style>/i;
 const scriptRegex = /<script.*?>([\s\S]*?)<\/script>/i;
 const templateRegex = /<template.*?>([\s\S]*?)<\/template>/i;
 
@@ -23,6 +22,10 @@ const PART_TYPE = {
 
 // 当前正在处理的文件名
 let filename = "";
+
+export function getCurrentFileName() {
+    return filename;
+}
 
 /**
  * 生成import语句
@@ -41,7 +44,7 @@ function generateImportPackagesStatement() {
  * @returns {Promise<string>}
  */
 async function classCodeGenerator(className, code) {
-    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} { setup() {${code[PART_TYPE.SCRIPT]}} render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} ${await code[PART_TYPE.STYLE]}};`;
+    return `class ${className} extends ${PackageName.CUSTOM_ELEMENT} {  setup() {${code[PART_TYPE.SCRIPT]}} render(ctx) { return ${code[PART_TYPE.TEMPLATE]};} style() { return ${PackageName.STYLE_PACKAGE_NAME}['${filename}']?.() } };`;
 }
 
 /**
@@ -78,23 +81,21 @@ async function generateExportStatement(code) {
  */
 export function parse(code, _filename) {
     filename = _filename;
+    let parts = {};
     Log.info(`开始编译 ===================================================== ${filename}.vue`)
     // Match and capture the style part
     const styleMatches = styleRegex.exec(code);
     const stylePart = styleMatches ? trimString(styleMatches[1]) : '';
+    parts[PART_TYPE.STYLE] = {code: stylePart, type: "style"};
 
     // Match and capture the script part
     const scriptMatches = scriptRegex.exec(code);
     const scriptPart = scriptMatches ? trimString(scriptMatches[1]) : '';
-
+    parts[PART_TYPE.SCRIPT] = {code: scriptPart, type: "script"};
     // Match and capture the template part
     const templateMatches = templateRegex.exec(code);
     const templatePart = templateMatches ? trimString(templateMatches[1]) : '';
-    const parts = {
-        [PART_TYPE.SCRIPT]: {code: scriptPart, type: "script"},
-        [PART_TYPE.STYLE]: {code: stylePart, type: "style"},
-        [PART_TYPE.TEMPLATE]: {code: templatePart, type: "template"}
-    };
+    parts[PART_TYPE.TEMPLATE] = {code: templatePart, type: "template"};
     return baseParser(generateNode(parts));
 }
 
@@ -107,6 +108,10 @@ function baseParser(node) {
     const result = { css: "", script: "", template: "", _import: "" };
     Object.keys(PART_TYPE).forEach(key => {
         const part = node.parts[PART_TYPE[key]];
+        // 如果没有这部分，则不处理，跳出循环
+        if (!part) {
+            return;
+        }
         // 分别处理javascript、css、html
         switch (PART_TYPE[key]) {
             case PART_TYPE.SCRIPT:
@@ -118,7 +123,9 @@ function baseParser(node) {
                 break;
             case PART_TYPE.STYLE:
                 Log.info(`开始编译 ------ ${filename} ------ style`)
-                result[PART_TYPE.STYLE] = lessParser(part.code); // 解析less语法
+                if (part.code) {
+                    lessParser(part.code); // 解析less语法
+                }
                 Log.success('编译完成 ------ style ------ success')
                 break;
             case PART_TYPE.TEMPLATE:

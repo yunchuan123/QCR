@@ -2,7 +2,6 @@ import { onMountedRun, collectionMountedFn } from "./lifrcycle/mounted.js";
 import { setInstance, clearInstance } from "./instance/index.js";
 import { setCollection, popColletion, setCurrentRefMap } from "./dom/attribute/custom/ref.js";
 import { getProps, getReactiveProps, updateProp } from "./props/index.js";
-
 import "./emit/index.js";
 
 export function _carRender(tree) {
@@ -23,13 +22,12 @@ export class CustomElement extends HTMLElement {
          * 这段代码也说明了, useInstance 只能在setup中使用
          */
         const context = this.callSetup();
-        
+        // 处理props
         this.processProps();
 
         // 结束收集mounted回调
         const mountedFns = collectionMountedFn();
         const shadowRoot = this.attachShadow({mode: "open"});
-
         let element;
         // render函数是编译模板自动生成的
         if (this.render) {
@@ -45,8 +43,12 @@ export class CustomElement extends HTMLElement {
             shadowRoot.appendChild(element);
         }
         // style 函数也是编译模板自动生成的
-        this.style && shadowRoot.appendChild(this.style());
-        
+        if (this.style) {
+            const _style = this.style();
+            if (_style) {
+                shadowRoot.appendChild(_style);
+            }
+        }
         // 设置当前refs todo：待优化
         setCurrentRefMap(refMap);
 
