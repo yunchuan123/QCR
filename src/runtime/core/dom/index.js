@@ -1,16 +1,8 @@
 import TagName from "./constant/tag-name.js";
 import {effect} from "@vue/reactivity";
 import { createReactiveAttribute } from "./attribute/reactive-attribute.js";
-import register from "./attribute/custom/index.js";
 import { processEvent, processNativeEvent } from "./attribute/event.js";
-
-const compilerAttribute = {};
-
-export function registerCompilerAttribute(attributeHandler) {
-    compilerAttribute[attributeHandler.name] = attributeHandler;
-}
-
-register(); // 注册所有attribute处理器
+import { compilerAttribute } from "./attribute/custom/index.js";
 
 function processAttribute(el, attr) {
     const keys = Object.keys(attr);
@@ -18,12 +10,12 @@ function processAttribute(el, attr) {
         keys.forEach(key => {
             const value = attr[key];
             const params = { el, value };
-           if (isCarEvent(key)) {
+           if (isCarEvent(key)) { // 处理自定义事件
                 // 处理事件绑定
                 processEvent(el, key, value);
-            } else if (isNativeEvent(key)) {
+            } else if (isNativeEvent(key)) { // 处理原生事件
                 processNativeEvent(el, key, value);
-            } else if (compilerAttribute[key]) {
+            } else if (compilerAttribute[key]) { // 处理自定义帮
                 const compiler = compilerAttribute[key];
                 compiler.handler(params);
             } else if (typeof value === "function") {
@@ -53,7 +45,7 @@ export function createDom(tagName, attr, children) {
         return document.createTextNode(children)
     }
     const el = document.createElement(tagName);
-
+    // 处理attribute
     processAttribute(el, attr);
 
     // 开始清理children

@@ -153,9 +153,7 @@ function constitute(result) {
  * @returns {{}}
  */
 function generateNode(parts = {}) {
-    const node = {};
-    node.parts = parts;
-    return node;
+    return { parts };
 }
 
 
